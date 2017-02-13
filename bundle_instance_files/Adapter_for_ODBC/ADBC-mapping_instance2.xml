@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mapping>
+  <event direction="upstream" encoder="none" name="invalid">
+    <id-rules>
+      <upstream/>
+    </id-rules>
+    <mapping-rules/>
+  </event>
+  <event copyUnmappedToDictionaryPayload="false" direction="both"
+    encoder="NullCodec" inject="false" name="SmartLinkOutputEvent" package="com.atlascopco.ctsconnectivity">
+    <id-rules>
+      <downstream>
+        <id fields="_ADBCType" test="==" value="com.atlascopco.ctsconnectivity.SmartLinkOutputEvent"/>
+      </downstream>
+      <upstream/>
+    </id-rules>
+    <mapping-rules>
+      <map apama="MachineEventHistoryId" default="0"
+        transport="machineeventhistoryid" type="integer"/>
+      <map apama="Level1" default="" transport="level1" type="string"/>
+      <map apama="Level2" default="" transport="level2" type="string"/>
+      <map apama="EventInfo" default="" transport="eventinfo" type="string"/>
+      <map apama="UtcTime" default="0.0" type="float"/>
+    </mapping-rules>
+  </event>
+</mapping>

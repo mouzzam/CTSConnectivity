@@ -1,0 +1,61 @@
+<adapter-config xmlns:xi="http://www.w3.org/2001/XInclude">
+
+	<logging level="INFO" file="logs/SendMailAdapter.log" />
+	<plugin-logging level="INFO" file="logs/SendMailTransport.log" />
+
+	<!-- Configure the embedded JVM with an initial heap size of 64MB -->
+	<java>
+		<classpath path="C:\Users\air15581\SoftwareAG\ApamaWork_5.2\studio_workspace\CTSConnectivityV2\src\MailAdaptor\activation-1.1.jar;C:\Users\air15581\SoftwareAG\ApamaWork_5.2\studio_workspace\CTSConnectivityV2\src\MailAdaptor\mail-1.4.jar;C:\Program Files\SoftwareAG\Apama 5.2\lib\util5.1.jar"/>
+		<jvm-option>-Dmail.smtp.auth=true</jvm-option>
+		<jvm-option>-Xms64m</jvm-option>
+	</java>
+
+<transports>
+		<transport name="SendMailTransport" jarName="C:\Users\air15581\SoftwareAG\ApamaWork_5.2\studio_workspace\CTSConnectivityV2\src\MailAdaptor\SendMailAdapter.jar" className="com.apamax.iaf.email.transport.SendMailTransport">
+			<property name="decoderName" value="JNullCodec"/>
+			<!-- SMTP host name. -->
+  			<property name="transportHost" value="smtp.emea.group.atlascopco.com"/>
+			<!-- Default port is 25 if not passed in. -->
+			<property name="port" value="25"/> 
+			<property name="username" value="" />
+			<property name="password" value="" />
+			<property name="IAFMailTo" value="koen.verschaeren@be.atlascopco.com" />
+			<property name="IAFMailFrom" value="koen.verschaeren@be.atlascopco.com" />
+			<property name="allowToFromEventConfig" value="true" />
+			<property name="logSuccess" value="true" />
+  		</transport>
+  </transports>
+
+	<codecs>
+		<codec name="JNullCodec" jarName="C:\Program Files\SoftwareAG\Apama 5.2\adapters\lib\JNullCodec.jar" className="com.apama.iaf.codec.nullcodec.JNullCodec"/>
+	</codecs>
+
+	<mapping>
+		<logUnmappedDownstream file="@LOG_DIR@/SendMail_unmapped_downstream_events.log"/>
+		<logUnmappedUpstream file="@LOG_DIR@/SendMail_unmapped_upstream_events.log"/>
+		
+		<event name="SendMail" package="com.apamax.email" direction="upstream" encoder="JNullCodec" copyUnmappedToPayload="false">
+			<id-rules>
+				<upstream/>
+			</id-rules>
+			<mapping-rules>
+				<map apama="" transport="__type" type="string" default="SendMail"/>
+				<map apama="emailTo" transport="mailTo" type="string" />
+				<map apama="emailFrom" transport="mailFrom" type="string" default="@SMTP_MAIL_FROM@"/>
+				<map apama="subject" transport="mailSubject" type="string" default=""/>
+				<map apama="body" transport="mailBody" type="string" default=""/>
+				<map apama="attachments" transport="attachments" type="reference" referencetype="sequence &lt; string &gt;" default="[]"/>
+			</mapping-rules>
+		</event>
+	</mapping>
+
+	<apama>
+		<sinks>
+			<sink host="localhost" port="15904"/>
+		</sinks>
+		<sources>
+			<source host="localhost" port="15904" channels="SEND_MAIL"/>
+		</sources>
+	</apama>
+
+</adapter-config>

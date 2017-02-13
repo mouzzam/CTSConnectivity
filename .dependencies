@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<apama-project>
+	<dependency>
+		<dependencyentry path="" kind="src" excluding="events/SmartLinkEvents.evt|events/SmartLinkEventsShort.evt|events/TestEvents.evt|monitors/EventCommunicationError.mon|monitors/EventSensorRules.mon|events/SmartLinkOutputEvent.evt|monitors/DbWriter.mon|events/ADBC-ODBC_instance2.evt|events/SmartLinkRuleDefinition.evt|events/SupervisionMachines.evt|monitors/MachineStatusOutput.mon|monitors/SystemMonitor.mon|monitors/ServiceWarning.mon|monitors/CommunicatonError.mon"/>
+		<dependencyentry path="C:/CEP/JDBC/sqljdbc_4.0/enu/sqljdbc4.jar" kind="db_extraJar"/>
+		<dependencyentry path="C:/CEP/JDBC/eysqlserver.jar" kind="db_extraJar"/>
+		<dependencyentry path="C:/CEP/JDBC/jtds-1.3.1.jar" kind="db_extraJar"/>
+	</dependency>
+	<catalogs>
+		<catalog path="catalogs/Generated scenario blocks" type="block"/>
+		<catalog path="catalogs/CTSConnectivity blocks" type="block"/>
+		<catalog path="catalogs/CTSConnectivity functions" type="function"/>
+	</catalogs>
+	<bundles>
+		<bundle file="MemoryStore.bnd" origin-path="" origin="PRODUCT_CATALOG">
+			<instance name=""/>
+			<config-files>
+			</config-files>
+			<bundle-instance-files>
+			</bundle-instance-files>
+			<static-files>
+			</static-files>
+			<dashboard-files>
+			</dashboard-files>
+			<evt-files>
+			</evt-files>
+		</bundle>
+		<bundle file="DataViewService.bnd" origin-path="" origin="PRODUCT_CATALOG">
+			<instance name=""/>
+			<config-files>
+			</config-files>
+			<bundle-instance-files>
+			</bundle-instance-files>
+			<static-files>
+			</static-files>
+			<dashboard-files>
+			</dashboard-files>
+			<evt-files>
+			</evt-files>
+		</bundle>
+		<bundle file="ADBC-ODBC.bnd" origin-path="" origin="ADAPTER_CATALOG">
+			<instance name="instance 1"/>
+			<config-files>
+				<file name="${APAMA_HOME}/adapters/config/ADBC-ODBC.xml.dist" timestamp="1486386660797"/>
+			</config-files>
+			<bundle-instance-files>
+				<file name="${APAMA_HOME}/adapters/config/ADBC-mapping.xml" timestamp="1486386660813"/>
+				<file name="${APAMA_HOME}/adapters/config/ADBC.settings" timestamp="1486386662295"/>
+			</bundle-instance-files>
+			<static-files>
+				<file name="${APAMA_HOME}/adapters/config/ADBC-application.xml" timestamp="1486386660797"/>
+				<file name="${APAMA_HOME}/adapters/config/ADBC-static.xml" timestamp="1486386662295"/>
+				<file name="${APAMA_HOME}/adapters/config/ADBC-static-codecs.xml" timestamp="1486386662295"/>
+				<file name="${APAMA_HOME}/adapters/config/ADBC-queryTemplates-SQL.xml" timestamp="1486386662295"/>
+			</static-files>
+			<dashboard-files>
+			</dashboard-files>
+			<evt-files>
+			</evt-files>
+		</bundle>
+	</bundles>
+</apama-project>

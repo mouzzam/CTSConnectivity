@@ -1,0 +1,24 @@
+
+
+// Example configuration settings for storing an event type
+//	integer messageId := 100;
+//	string serviceName := "com.apama.adbc.JDBC";
+//	string eventSourceType := "event";
+//	string eventName := "com.test.SimpleTestEvent";
+//	string dbUrl := "jdbc:mysql://localhost/adbcexample";
+//	string userName := "root";
+//	string password := "password";
+//	string tableName := "WidgetSales";
+//	string timeColumn := "timeColumn";
+//	string autoCommit := "true";
+//	float throttlePeriod := 0.0;							// NA for events
+//	boolean parallelExecution := false;
+//	dictionary<string,string> scenarioVarMapping := {};		// NA for events
+//	dictionary<string,integer> scenarioOutputMapping := {};	// NA for events
+//	boolean autoStart := true;
+//	dictionary<string,string> extraParams := new dictionary<string,string>;
+
+com.apama.database.CreateStoreConfiguration(0,"com.apama.adbc.ODBC_INSTANCE_1","event","com.atlascopco.ctsconnectivity.SmartLinkEventDb","ApamaSQLWriteV2","MicroStrategy_DEV_RW","udEze6Re","CEP_FACT_Events","InsertedOn","true",0.0,false,{},{},true,{})
+
+
+com.apama.database.CreateStoreConfiguration(1,"com.apama.adbc.ODBC_INSTANCE_1","event","com.atlascopco.ctsconnectivity.OutputConclusionToDatabase","ApamaSQLWriteV2","microstrategy_dev_rw","udEze6Re","CEP_FACT_Conclusions","insertedon","true",0.0,false,{},{},true,{})

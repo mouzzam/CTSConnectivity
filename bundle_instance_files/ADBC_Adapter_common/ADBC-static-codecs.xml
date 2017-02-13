@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+	This file contains the "static" elements of the ADBC adapter configuration,
+	i.e. the event mapping parts of the configuration that should not need
+	to be modified by the user. These elements should be included in the main
+	configuration file using XInclude directives as shown below:
+
+		<xi:include href="ADBC-static-codecs.xml" xpointer="xpointer(//codec)" />
+
+	Note that in order to comply with the configuration file DTD, the
+	<adapter-config> element should also contain a "xmlns:xi" attribute as
+	shown below:
+
+	<adapter-config xmlns:xi="http://www.w3.org/2001/XInclude">
+
+
+	$Copyright (c) 2009 Progress Software Corporation. All rights reserved. $
+	$Copyright (c) 2013 Software AG, Darmstadt, Germany and/or Software AG USA Inc., Reston, VA, USA, and/or its Subsidiaries and or/its Affiliates and/or their licensors.$
+	Use, reproduction, transfer, publication or disclosure is prohibited except as specifically provided for in your License Agreement with Software AG
+
+-->
+
+<codecs xmlns:xi="http://www.w3.org/2001/XInclude">
+
+	<codec name="NullCodec" library="NullCodec"/>
+
+</codecs>

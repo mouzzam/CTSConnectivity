@@ -1,0 +1,1967 @@
+//*****************************************************************************
+//Title:         SensorChecks
+//Description:   SensorChecks description
+//Dependencies:  None
+//Author:        air15396
+
+//*****************************************************************************
+
+//Connect to workstation with messagereader
+//engine_connect -sn airlbe6tl075j -sp 15903 -tn localhost -tp 15904 -c RuleProcessor
+//engine_connect -sn airlbe6tl075j -sp 15904 -tn localhost -tp 15904 -c MasterDataChannel
+/*Connect to MasterdataChannel to test if new machineId's are inserted*/
+
+//engine_connect -sn localhost -sp 15904 -tn localhost -tp 15903 -c MasterDataChannel
+
+
+
+//Event to trigger code:
+/*
+com.atlascopco.ctsconnectivity.SmartLinkSensorCheck(com.atlascopco.ctsconnectivity.SmartLinkEvent(12504026,3,"GeneralWarning",1221,206851,"605","OilPressure",-9999.0000,1388735760,"2014-01-03 07:56:00.000","2014-01-03 07:56:00.000"),"1","2","eventinfo")
+com.atlascopco.ctsconnectivity.SmartLinkRepeatCheck(com.atlascopco.ctsconnectivity.SmartLinkRuleEvent("GeneralWarning","605","1421244908",{"2700":"1421244908"},{"2500":"70","2501":"66080"},1421244878,1421244906,1421248478,"353270040848378","ERS5_13","ERS5",3,"N","W. Europe Standard Time",3600,"visualization","Y","SmartBox","MISSING","MISSING","MISSING","MISSING","MISSING","MISSING","MISSING","MISSING","MISSING","MISSING","MISSING","MISSING","MISSING","MISSING","MISSING","MISSING"))
+
+
+//Wrong Startup phase output
+
+//SmartLinkRuleEvent("GeneralShutdown","1008","365,45",{"1008":"365.45"},{"1001":"302.45","1103":"273.15","1214":"299.95","2100":"1","2101":"0","2102":"0","2103":"0","2104":"1","2105":"1","2124":"0","2300":"0","2301":"0","2302":"0","2303":"0","2304":"0","2305":"1","2306":"0","2307":"0","2308":"1","2500":"262230","2501":"66082","2510":"14","2511":"0","2512":"1","2513":"8","2520":"0","2521":"0","2523":"0","2524":"271","2525":"0","2700":"171925565","2701":"142587342","2702":"14757","2703":"203607058","2705":"93963","2728":"551972874","501":"-100","509":"404900","602":"1100","604":"-5600","7476":"1133635","7477":"0"},1444639258,1444639260,1444668058,"353270041658024","GA160-13",3,"Y","China Standard Time",28800,"notification","Y","SmartBox","GA","GeneralShutdownRules","Y","Y","N","","Y","M","1","Shutdown - Element temp related -  Check with customer","M","7","Shutdown cleared within 7 minutes","","","","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkSensorCheck(com.atlascopco.ctsconnectivity.SmartLinkRuleEvent("GeneralShutdown","1008","365,45",{"1008":"365.45"},{"1000":"301.15","1001":"317.75","1004":"318.95","1005":"462.25","1102":"331.05","1203":"300.45","1204":"482.75","1106":"400.65","1700":"167.55160816","2100":"1","2101":"0","2124":"0","2304":"0","2305":"0","2306":"1","2307":"1","2310":"1","2311":"0","2312":"0","2313":"1","2381":"1","2500":"655685","2501":"544","2510":"7","2511":"0","2512":"4","2513":"148","2520":"259","2521":"0","2523":"259","2524":"0","2525":"0","2700":"322532622","2702":"3274","2703":"29715807","2704":"256968","2705":"40445","2706":"20892703","2707":"2985312","2708":"34063781","2709":"43993605","2710":"220597225","2728":"31638056","501":"-2900","509":"812700","511":"572400","604":"127600","7476":"152622","7477":"0"},1421333788,1421333789,1421353588,"353270042213530","ZR315VSD",3,"N","India Standard Time",19800,"notification","Y","SmartBox","GeneralShutdownWarningRules","Y","Y","N","","Y","M","1","Check ventilation/filters with customer / possible coating wear","M","7","ShutdownWarning cleared within 7 minutes","M","6","ShutdownWarning - repeating within 24 hours","V0.5"),"M","1","Check ventilation/filters with customer / possible coating wear")
+
+
+
+//Sensor checks being done while N
+com.atlascopco.ctsconnectivity.SmartLinkSensorCheck(com.atlascopco.ctsconnectivity.SmartLinkRuleEvent("GeneralShutdown","1211","365,45",{"1008":"365.45"},{"1000":"301.15","1001":"317.75","1004":"318.95","1005":"462.25","1102":"331.05","1203":"300.45","1204":"482.75","1106":"400.65","1700":"167.55160816","2100":"1","2101":"0","2124":"0","2304":"0","2305":"0","2306":"1","2307":"1","2310":"1","2311":"0","2312":"0","2313":"1","2381":"1","2500":"655685","2501":"544","2510":"7","2511":"0","2512":"4","2513":"148","2520":"259","2521":"0","2523":"259","2524":"0","2525":"0","2700":"322532622","2702":"3274","2703":"29715807","2704":"256968","2705":"40445","2706":"20892703","2707":"2985312","2708":"34063781","2709":"43993605","2710":"220597225","2728":"31638056","501":"-2900","509":"812700","511":"572400","604":"127600","7476":"152622","7477":"0"},1421333788,1421333789,1421353588,"353270042213530","ZR315VSD",3,"N","India Standard Time",19800,"notification","Y","SmartBox","GeneralShutdownWarningRules","Y","Y","N","","Y","M","1","Check ventilation/filters with customer / possible coating wear","M","7","ShutdownWarning cleared within 7 minutes","M","6","ShutdownWarning - repeating within 24 hours","V0.5"),"M","1","Check ventilation/filters with customer / possible coating wear")
+
+
+
+ValidOutput
+com.atlascopco.ctsconnectivity.SmartLinkSensorCheck(com.atlascopco.ctsconnectivity.SmartLinkRuleEvent("GeneralShutdownWarning","1003","486,15",{"1003":"486.15"},{"1000":"301.15","1001":"317.75","1004":"318.95","1005":"462.25","1102":"331.05","1203":"316.45","1204":"482.75","1207":"326.65","1700":"167.55160816","2100":"1","2101":"0","2124":"0","2304":"0","2305":"0","2306":"1","2307":"1","2310":"1","2311":"0","2312":"0","2313":"1","2381":"1","2500":"655685","2501":"544","2510":"7","2511":"0","2512":"4","2513":"148","2520":"259","2521":"0","2523":"259","2524":"0","2525":"0","2700":"322532622","2702":"3274","2703":"29715807","2704":"256968","2705":"40445","2706":"20892703","2707":"2985312","2708":"34063781","2709":"43993605","2710":"220597225","2728":"31638056","501":"-2900","509":"812700","511":"272400","605":"3276000","7476":"152622","7477":"0"},1421333788,1421333789,1421353588,"353270042213530","ZR315VSD",3,"N","India Standard Time",19800,"notification","Y","SmartBox","GA","GeneralShutdownWarningRules","Y","Y","N","","Y","M","1","Check ventilation/filters with customer / possible coating wear","M","7","ShutdownWarning cleared within 7 minutes","M","6","ShutdownWarning - repeating within 24 hours","V0.5"),"M","1","Check ventilation/filters with customer / possible coating wear")
+com.atlascopco.ctsconnectivity.SmartLinkSensorCheck(com.atlascopco.ctsconnectivity.SmartLinkRuleEvent("GeneralShutdownWarning","602","100000,15",{"602":"100000.15"},{"1000":"301.15","1001":"317.75","1004":"318.95","1005":"462.25","1102":"331.05","1203":"316.45","1204":"482.75","1207":"326.65","1700":"167.55160816","2100":"1","2101":"0","2124":"0","2304":"0","2305":"0","2306":"1","2307":"1","2310":"1","2311":"0","2312":"0","2313":"1","2381":"1","2500":"655685","2501":"544","2510":"7","2511":"0","2512":"4","2513":"148","2520":"259","2521":"0","2523":"259","2524":"0","2525":"0","2700":"322532622","2702":"3274","2703":"29715807","2704":"256968","2705":"40445","2706":"20892703","2707":"2985312","2708":"34063781","2709":"43993605","2710":"220597225","2728":"31638056","501":"-2900","509":"812700","511":"272400","605":"3276000","7476":"152622","7477":"0"},1421333788,1421333789,1421353588,"353270042213530","ZR315VSD",3,"N","India Standard Time",19800,"notification","Y","SmartBox","ZR","GeneralShutdownWarningRules","Y","Y","N","","Y","M","1","Check ventilation/filters with customer / possible coating wear","M","7","ShutdownWarning cleared within 7 minutes","M","6","ShutdownWarning - repeating within 24 hours","V0.5"),"M","1","Check ventilation/filters with customer / possible coating wear")
+
+
+NoSpecificChecksDefinedYet
+com.atlascopco.ctsconnectivity.SmartLinkSensorCheck(com.atlascopco.ctsconnectivity.SmartLinkRuleEvent("GeneralShutdownWarning","2700","486,15",{"2700":"486.15"},{"1000":"301.15","1001":"317.75","1004":"318.95","1005":"462.25","1102":"331.05","1203":"316.45","1204":"482.75","1207":"326.65","1700":"167.55160816","2100":"1","2101":"0","2124":"0","2304":"0","2305":"0","2306":"1","2307":"1","2310":"1","2311":"0","2312":"0","2313":"1","2381":"1","2500":"655685","2501":"544","2510":"7","2511":"0","2512":"4","2513":"148","2520":"259","2521":"0","2523":"259","2524":"0","2525":"0","2700":"322532622","2702":"3274","2703":"29715807","2704":"256968","2705":"40445","2706":"20892703","2707":"2985312","2708":"34063781","2709":"43993605","2710":"220597225","2728":"31638056","501":"-2900","509":"812700","511":"272400","605":"3276000","7476":"152622","7477":"0"},1421333788,1421333789,1421353588,"353270042213530","ZR315VSD",3,"N","India Standard Time",19800,"notification","Y","SmartBox","ZR","GeneralShutdownWarningRules","Y","Y","N","","Y","M","1","Check ventilation/filters with customer / possible coating wear","M","7","ShutdownWarning cleared within 7 minutes","M","6","ShutdownWarning - repeating within 24 hours","V0.5"),"M","1","Check ventilation/filters with customer / possible coating wear")
+
+
+Specific check test with no matches
+com.atlascopco.ctsconnectivity.SmartLinkSensorCheck(com.atlascopco.ctsconnectivity.SmartLinkRuleEvent("GeneralShutdownWarning","1003","486,15",{"1003":"285.15"},{"1000":"285.15","1001":"285.75","1004":"285.95","1005":"285.25","1102":"285.05","1203":"285.45","1204":"285.75","1207":"285.65","1700":"167.55160816","2100":"1","2101":"0","2124":"0","2304":"0","2305":"0","2306":"1","2307":"1","2310":"1","2311":"0","2312":"0","2313":"1","2381":"1","2500":"655685","2501":"544","2510":"7","2511":"0","2512":"4","2513":"148","2520":"259","2521":"0","2523":"259","2524":"0","2525":"0","2700":"322532622","2702":"3274","2703":"29715807","2704":"256968","2705":"40445","2706":"20892703","2707":"2985312","2708":"34063781","2709":"43993605","2710":"220597225","2728":"31638056","501":"-2900","509":"812700","511":"252400","605":"3276000","7476":"152622","7477":"0"},1421333788,1421333789,1421353588,"353270042213530","ZR315VSD",3,"N","India Standard Time",19800,"notification","Y","SmartBox","ZR","GeneralShutdownWarningRules","Y","Y","N","","Y","M","1","Check ventilation/filters with customer / possible coating wear","M","7","ShutdownWarning cleared within 7 minutes","M","6","ShutdownWarning - repeating within 24 hours","V0.5"),"M","1","Check ventilation/filters with customer / possible coating wear")
+com.atlascopco.ctsconnectivity.SmartLinkSensorCheck(com.atlascopco.ctsconnectivity.SmartLinkRuleEvent("GeneralShutdownWarning","1000","286,15",{"1003":"285.15"},{"1000":"285.15","1001":"285.75","1004":"285.95","1005":"285.25","1102":"285.05","1203":"285.45","1204":"285.75","1207":"285.65","1700":"167.55160816","2100":"1","2101":"0","2124":"0","2304":"0","2305":"0","2306":"1","2307":"1","2310":"1","2311":"0","2312":"0","2313":"1","2381":"1","2500":"655685","2501":"544","2510":"7","2511":"0","2512":"4","2513":"148","2520":"259","2521":"0","2523":"259","2524":"0","2525":"0","2700":"322532622","2702":"3274","2703":"29715807","2704":"256968","2705":"40445","2706":"20892703","2707":"2985312","2708":"34063781","2709":"43993605","2710":"220597225","2728":"31638056","501":"-2900","509":"812700","511":"252400","605":"3276000","7476":"152622","7477":"0"},1421333788,1421333789,1421353588,"353270042213530","ZR315VSD",3,"N","India Standard Time",19800,"notification","Y","SmartBox","ZR","GeneralShutdownWarningRules","Y","Y","N","","Y","M","1","Check ventilation/filters with customer / possible coating wear","M","7","ShutdownWarning cleared within 7 minutes","M","6","ShutdownWarning - repeating within 24 hours","V0.5"),"M","1","Check ventilation/filters with customer / possible coating wear")
+
+
+com.atlascopco.ctsconnectivity.triggerCodeEvent("test");
+
+combined check test:
+
+com.atlascopco.ctsconnectivity.SmartLinkSensorCheck(com.atlascopco.ctsconnectivity.SmartLinkRuleEvent("GeneralShutdownWarning","1003","493,15",{"1003":"493.15"},{"1000":"301.15","1001":"317.75","1004":"318.95","1005":"462.25","1102":"331.05","1203":"316.45","1204":"482.75","1207":"326.65","1700":"167.55160816","2100":"1","2101":"0","2124":"0","2304":"0","2305":"0","2306":"1","2307":"1","2310":"1","2311":"0","2312":"0","2313":"1","2381":"1","2500":"655685","2501":"544","2510":"7","2511":"0","2512":"4","2513":"148","2520":"259","2521":"0","2523":"259","2524":"0","2525":"0","2700":"322532622","2702":"3274","2703":"29715807","2704":"256968","2705":"40445","2706":"20892703","2707":"2985312","2708":"34063781","2709":"43993605","2710":"220597225","2728":"31638056","501":"-2900","509":"812700","511":"572400","605":"3276000","7476":"152622","7477":"0"},1421333788,1421333789,1421353588,"353270042213530","ZR315VSD",3,"N","India Standard Time",19800,"notification","Y","SmartBox","ZR","GeneralShutdownWarningRules","Y","Y","N","","Y","M","1","Check ventilation/filters with customer / possible coating wear","M","7","ShutdownWarning cleared within 7 minutes","M","6","ShutdownWarning - repeating within 24 hours","V0.5"),"M","1","Check ventilation/filters with customer / possible coating wear")
+combined check test 4:
+
+com.atlascopco.ctsconnectivity.SmartLinkSensorCheck(com.atlascopco.ctsconnectivity.SmartLinkRuleEvent("GeneralShutdownWarning","1008","493,15",{"1003":"493.15"},{"1000":"301.15","1001":"317.75","1004":"318.95","1005":"462.25","1102":"331.05","1203":"300.45","1204":"482.75","1106":"400.65","1700":"167.55160816","2100":"1","2101":"0","2124":"0","2304":"0","2305":"0","2306":"1","2307":"1","2310":"1","2311":"0","2312":"0","2313":"1","2381":"1","2500":"655685","2501":"544","2510":"7","2511":"0","2512":"4","2513":"148","2520":"259","2521":"0","2523":"259","2524":"0","2525":"0","2700":"322532622","2702":"3274","2703":"29715807","2704":"256968","2705":"40445","2706":"20892703","2707":"2985312","2708":"34063781","2709":"43993605","2710":"220597225","2728":"31638056","501":"-2900","509":"812700","511":"572400","604":"127600","7476":"152622","7477":"0"},1421333788,1421333789,1421353588,"353270042213530","ZR315VSD",3,"N","India Standard Time",19800,"notification","Y","SmartBox","ZR","GeneralShutdownWarningRules","Y","Y","N","","Y","M","1","Check ventilation/filters with customer / possible coating wear","M","7","ShutdownWarning cleared within 7 minutes","M","6","ShutdownWarning - repeating within 24 hours","V0.5"),"M","1","Check ventilation/filters with customer / possible coating wear")
+
+/*VSD converter fault code*/
+/*
+com.atlascopco.ctsconnectivity.SmartLinkSensorCheck(com.atlascopco.ctsconnectivity.SmartLinkRuleEvent("GeneralShutdown","7385","8963,8",{"7385":"8963,8"},{"8582":"24834","8574":"7","1000":"301.15","1001":"317.75","1004":"318.95","1005":"462.25","1102":"331.05","1203":"300.45","1204":"482.75","1106":"400.65","1700":"167.55160816","2100":"1","2101":"0","2124":"0","2304":"0","2305":"0","2306":"1","2307":"1","2310":"1","2311":"0","2312":"0","2313":"1","2381":"1","2500":"655685","2501":"544","2510":"7","2511":"0","2512":"4","2513":"148","2520":"259","2521":"0","2523":"259","2524":"0","2525":"0","2700":"322532622","2702":"3274","2703":"29715807","2704":"256968","2705":"40445","2706":"20892703","2707":"2985312","2708":"34063781","2709":"43993605","2710":"220597225","2728":"31638056","501":"-2900","509":"812700","511":"572400","604":"127600","7476":"152622","7477":"0"},1421333788,1421333789,1421353588,"353270040890453","ZR315VSD",3,"N","India Standard Time",19800,"notification","Y","SmartBox","ZR","GeneralShutdownWarningRules","Y","Y","N","","Y","M","1","Check ventilation/filters with customer / possible coating wear","M","7","ShutdownWarning cleared within 7 minutes","M","6","ShutdownWarning - repeating within 24 hours","V0.5"),"M","1","Check ventilation/filters with customer / possible coating wear")
+com.atlascopco.ctsconnectivity.SmartLinkSensorCheck(com.atlascopco.ctsconnectivity.SmartLinkRuleEvent("GeneralShutdown","7385","8963,8",{"7385":"8963,8"},{"1000":"301.15","1001":"317.75","1004":"318.95","1005":"462.25","1102":"331.05","1203":"300.45","1204":"482.75","1106":"400.65","1700":"167.55160816","2100":"1","2101":"0","2124":"0","2304":"0","2305":"0","2306":"1","2307":"1","2310":"1","2311":"0","2312":"0","2313":"1","2381":"1","2500":"655685","2501":"544","2510":"7","2511":"0","2512":"4","2513":"148","2520":"259","2521":"0","2523":"259","2524":"0","2525":"0","2700":"322532622","2702":"3274","2703":"29715807","2704":"256968","2705":"40445","2706":"20892703","2707":"2985312","2708":"34063781","2709":"43993605","2710":"220597225","2728":"31638056","501":"-2900","509":"812700","511":"572400","604":"127600","7476":"152622","7477":"0"},1421333788,1421333789,1421353588,"353270040890453","ZR315VSD",3,"N","India Standard Time",19800,"notification","Y","SmartBox","ZR","GeneralShutdownWarningRules","Y","Y","N","","Y","M","1","Check ventilation/filters with customer / possible coating wear","M","7","ShutdownWarning cleared within 7 minutes","M","6","ShutdownWarning - repeating within 24 hours","V0.5"),"M","1","Check ventilation/filters with customer / possible coating wear")
+ 
+
+*/
+
+package com.atlascopco.ctsconnectivity;
+
+using com.apama.memorystore.Store;
+using com.apama.memorystore.Table;
+using com.apama.memorystore.Storage;
+using com.apama.memorystore.Finished;
+using com.apama.memorystore.Row;
+using com.apama.aggregates.max;
+
+monitor SensorBasedChecks {
+
+	/*Prepare storage variables*/
+	Storage storage;
+
+	Store AggregatesStore;
+	Store ConclusionsStore;
+	
+
+
+	/*Enable or disable debug information in console*/
+	boolean DEBUG := false;
+	boolean DEBUGCooling := false;
+	boolean DEBUGCOMBINED := false;
+	boolean DEBUGConverter := false;
+	boolean DEBUGIngoingOutgoingEvents := false;
+
+	/* Dictionaries to store registers & sensorValues (attached to event)*/
+	dictionary<string, sequence<string> > RegisterConversion;
+	dictionary<string, dictionary<string, string > > SensorValues;
+	dictionary<integer, sequence<string > > ConverterMasterData;
+	dictionary<string, sequence<string > > ConverterFaultCodes;
+
+	/*Default output event*/
+	checkResult OUTPUT_RESULT := checkResult(""
+	                                         ,""
+	                                         ,"-1_-1"
+	                                         ,"CheckMatchedDefault"
+	                                         ,"TypeDefault"
+	                                         ,"DefaultConclusion"
+	                                         ,"DefaultLevel1"
+	                                         ,"DefaultLevel2"
+	                                         ,"No Advice Available"
+	                                         ,false
+	                                         ,false
+	                                         ,false
+	                                         ,""
+	                                         ,"");
+	integer COUNTER := 0;
+	boolean MatchedEventReceived := false;
+	boolean CombineResultReady :=   false;
+	integer incomingEventsCounter := 0;
+	integer outgoingEventsCounter := 0;
+
+
+	action onload()
+	{  
+		/*Load RegisterName,Quantity,RegisterDescription in dictionary RegisterConversion*/
+		prepareRegisterNameConvertor();
+
+
+		/*Load category to convertertype conversion*/
+		GetConverterMasterData();
+		GetConverterFaultCodes();
+
+		/*When Memorystore is prepared, event will be received from PrepareMemStorGetAggregates.mon*/
+		on StartSensorChecksEvent() {
+
+			openStore();
+			enableCleanSensorValueDictionary();
+
+			if DEBUG then { print "StartSensorchecksEvent received";}
+
+		}
+
+		/*Check to compare outgoing events with ingoing events (should be equal*/
+		if DEBUG then {
+			on all outgoingEventsCounterEvent(){
+				outgoingEventsCounter := outgoingEventsCounter + 1;
+			}
+		}
+		
+		
+		
+	}	
+
+	action GetConverterMasterData() {
+		SmartLinkConverterMasterData SmartLinkConverterMasterData;
+
+		on all SmartLinkConverterMasterData():SmartLinkConverterMasterData{
+
+			if DEBUGConverter then 
+			{ print "SmartLinkConverterEvent received: " + SmartLinkConverterMasterData.toString();}
+
+
+			sequence<string> row := [];
+
+			row.append(SmartLinkConverterMasterData.CategoryId.toString());
+			row.append(SmartLinkConverterMasterData.ConverterType);
+
+			// Lookup key (if key exists already: overwrite)
+			ConverterMasterData.add(SmartLinkConverterMasterData.ConverterId, row );				
+		}	
+
+	}
+
+
+	action GetConverterFaultCodes() {
+		SmartLinkConverterFaultCode SmartLinkConverterFaultCode;
+
+		on all SmartLinkConverterFaultCode():SmartLinkConverterFaultCode{
+
+			if DEBUGConverter then 
+			{ print "SmartLinkConverterFaultCode received: " + SmartLinkConverterFaultCode.toString();}
+
+
+			sequence<string> row := [];
+
+			row.append(SmartLinkConverterFaultCode.ConverterId.toString());
+			row.append(SmartLinkConverterFaultCode.VSDFaultCode.toString());
+			row.append(SmartLinkConverterFaultCode.ACFaultCode.toString());
+			row.append(SmartLinkConverterFaultCode.ArticleId.toString());
+
+			// Lookup key (if key exists already: overwrite)
+			ConverterFaultCodes.add(SmartLinkConverterFaultCode.ConverterId.toString() + SmartLinkConverterFaultCode.VSDFaultCode.toString(), row );				
+		}
+	}
+
+	/**Open store*/
+	action openStore() 
+	{		
+		AggregatesStore := storage.open("AggregatesStore");
+		ConclusionsStore := storage.open("ConclusionsStore");
+		if DEBUG then {print "Memory stores in sensorchecks opened.";}
+
+		on wait(3.0) {
+			/*When stores are prepared, listen for events*/
+			handleSensorCheckRequest();
+		}		
+	}
+
+
+	/**Process events*/
+	action handleSensorCheckRequest{	
+		SmartLinkSensorCheckKey EventToAnalyse;
+		SmartLinkSensorCheck SmartLinkSensorCheck;
+		string FaultySensorTestResult;
+
+			on all SmartLinkSensorCheck():SmartLinkSensorCheck {
+
+
+
+			if DEBUG then {
+				print "MODELPREFIX: " + SmartLinkSensorCheck.SmartLinkEvent.ModelPrefix.toString();
+			}
+
+
+			if DEBUGIngoingOutgoingEvents then { print "NIEUW event: "   
+				+ "Incoming EventsCounter: " + incomingEventsCounter.toString()
+				+ " Outgoing EventsCounter: " + outgoingEventsCounter.toString()  + " Event: "	+ SmartLinkSensorCheck.toString() ;
+
+			incomingEventsCounter := incomingEventsCounter + 1;
+			}
+
+
+			/*Add Key to SmartlinkSensorCheck Event*/
+			string EventKey := SmartLinkSensorCheck.SmartLinkEvent.CommunicationToken + "#" 
+			+ SmartLinkSensorCheck.SmartLinkEvent.EventName + "#" + SmartLinkSensorCheck.SmartLinkEvent.UtcTime.toString() + "#" 
+			+ SmartLinkSensorCheck.SmartLinkEvent.RegisterName + "#EOL";
+
+
+			/*add all the different sensorvalues to a dictionary*/
+			addSensorValToDictionary(EventKey,SmartLinkSensorCheck.SmartLinkEvent.CommunicationToken,SmartLinkSensorCheck.SmartLinkEvent.UtcTime, SmartLinkSensorCheck.SmartLinkEvent.ArrayRelatedSensorsReading,SmartLinkSensorCheck.SmartLinkEvent.ArraySensorsReading);
+
+
+			/*Gather CheckResults*/
+			spawn combineResults(SmartLinkSensorCheckKey(EventKey,SmartLinkSensorCheck.SmartLinkEvent,SmartLinkSensorCheck.Level1,SmartLinkSensorCheck.Level2,
+			                                             SmartLinkSensorCheck.EventInfo));
+
+
+
+			SmartLinkOutputDefinition def;
+			/*Check if EventName requires further (originator specific) processing*/
+			def :=  getDetailedRuleDefinitionOutput(SmartLinkSensorCheck.SmartLinkEvent.EventName,"","DefaultNoRegisterNameCheck",false);
+			if def.CheckRegister = "N" then {
+
+				/*No event specific calculation required: default output for EventName*/
+				processConclusion(SmartLinkSensorCheckKey(EventKey,SmartLinkSensorCheck.SmartLinkEvent,SmartLinkSensorCheck.Level1,SmartLinkSensorCheck.Level2,
+				                                          SmartLinkSensorCheck.EventInfo),"DefaultNoRegisterNameCheck","", "", true,true,false,"","");		
+			}
+			else {
+				/*Verify if RegisterName is not missing*/
+				if SmartLinkSensorCheck.SmartLinkEvent.RegisterName = ""
+				then {	
+					/*Take default conclusion for missing originators*/
+					processConclusion(SmartLinkSensorCheckKey(EventKey,SmartLinkSensorCheck.SmartLinkEvent,SmartLinkSensorCheck.Level1,SmartLinkSensorCheck.Level2,
+					                                          SmartLinkSensorCheck.EventInfo),"DefaultMissingOriginator","", "", true,true,false,"","");					
+
+				}
+				else {					
+					/*RegisterName not missing, route the SmartlinkSensorCheck event that was enriched with a unique EventKey to originator checks*/
+					route SmartLinkSensorCheckKey(EventKey,SmartLinkSensorCheck.SmartLinkEvent,SmartLinkSensorCheck.Level1,SmartLinkSensorCheck.Level2,
+					                              SmartLinkSensorCheck.EventInfo);
+				}				
+			}		
+		}
+
+
+		/**Assign the checks to originators*/
+
+		on all SmartLinkSensorCheckKey():EventToAnalyse {	
+
+			string DiscardResult;
+			string CondensateICRegisters := "2195,2392,2938,7166,7172,7201";	
+			string RegenerationAirCheckRegisternames := "1017,1019,1409,1011";
+			string CondensateACRegisters := "2196,2197,2393,2394,2939,2940";	
+
+			/**General checks*/	
+
+			/*SensorChecks*/
+			spawn sensorQualityChecks(EventToAnalyse,true,true);
+			/*CoolingChecks*/						
+			spawn coolingSystemCheckCombined(EventToAnalyse,true,false);
+
+			/**Specific checks*/
+
+
+			/*Event received: RegAirOutlet ReAirInlet Inlet Dryer Dryer regen.IN-inlet DT*/
+			if RegenerationAirCheckRegisternames.find(EventToAnalyse.SmartLinkEvent.RegisterName) > -1 then {
+
+				//spawn combineChecksConclusions(EventToAnalyse);	
+				//spawn processConclusion(EventToAnalyse,"Default","", "", false,true,false);
+
+				/*SensorChecks*/
+				spawn sensorQualityChecks(EventToAnalyse,false,true);
+				/*CoolingChecks*/						
+				spawn coolingSystemCheckCombined(EventToAnalyse,false,true);
+
+				spawn regenerationAirTempCheck(EventToAnalyse,false,true);
+
+			}
+
+			/**Event received: Ambient temp / Cooling Air / Cooling Water in */
+			else if EventToAnalyse.SmartLinkEvent.RegisterName = "1000" or EventToAnalyse.SmartLinkEvent.RegisterName = "1200"
+			or EventToAnalyse.SmartLinkEvent.RegisterName = "1203"
+			then {
+
+				//spawn processConclusion(EventToAnalyse,"Default","", "", false,true,false);
+
+				/*SensorChecks*/
+				spawn sensorQualityChecks(EventToAnalyse,false,true);
+				/*CoolingChecks*/						
+				spawn coolingSystemCheckCombined(EventToAnalyse,false,true);
+
+			}
+
+			
+			/**Event received: Block air*/
+			else if EventToAnalyse.SmartLinkEvent.RegisterName = "521"
+
+			then {
+
+				/*SensorChecks*/
+				spawn sensorQualityChecks(EventToAnalyse,false,true);
+				/*BlockAirCheck*/						
+				spawn processConclusion(EventToAnalyse,"BLKA_1_1_1","", "", false,true,true,"","");
+
+			}
+			
+
+			/**Event received: OilPressure originator*/
+			else if EventToAnalyse.SmartLinkEvent.RegisterName = "605"
+
+			then {
+
+				/*Combine and Output*/
+				//spawn combineChecksConclusions(EventToAnalyse);					
+
+				//spawn processConclusion(EventToAnalyse,"Default","", "", false,true,false);
+
+				/*SensorChecks*/
+				spawn sensorQualityChecks(EventToAnalyse,false,true);
+				/*CoolingChecks*/						
+				spawn coolingSystemCheckCombined(EventToAnalyse,false,true);
+				/*OilPressureCheck*/
+				spawn oilPressureCheck7D(EventToAnalyse,false,true);
+
+
+
+
+			}
+
+			/**Event received: Oil Separator originator*/
+			else if EventToAnalyse.SmartLinkEvent.RegisterName = "602"
+
+			then {
+
+				/*Combine and Output*/
+				//spawn combineChecksConclusions(EventToAnalyse);					
+
+				//spawn processConclusion(EventToAnalyse,"Default","", "", false,true,false);
+
+				/*SensorChecks*/
+				spawn sensorQualityChecks(EventToAnalyse,false,true);
+
+				/*OilSeparatorCheck*/
+				spawn oilSeparatorCheck(EventToAnalyse,false,true);
+
+
+			}
+
+
+
+			/**Event received: InterCoolerPressure originator*/
+			else if EventToAnalyse.SmartLinkEvent.RegisterName = "511"
+
+			then {
+
+				/*Combine and Output*/
+				//spawn combineChecksConclusions(EventToAnalyse);					
+
+				//spawn processConclusion(EventToAnalyse,"Default","", "", false,true,false);
+
+				/*SensorChecks*/
+				spawn sensorQualityChecks(EventToAnalyse,false,true);
+				/*CoolingChecks*/						
+				spawn coolingSystemCheckCombined(EventToAnalyse,false,true);
+				/*OilSeparatorCheck*/
+				spawn oilSeparatorCheck(EventToAnalyse,false,true);
+				/*OilCoolerCheck*/
+				spawn oilCoolerCheck(EventToAnalyse,false,true);
+				/*OilPressureCheck*/
+				spawn oilPressureCheck7D(EventToAnalyse,false,true);				
+				/*InterCoolerCheck*/
+				spawn interCoolerPressureCheckEvent(EventToAnalyse,false,true);
+				spawn interCoolerPressureCheck7D(EventToAnalyse,false,true);
+			}
+
+
+			/**Event received: Electr. condensate drain or Condensate Drain AC*/
+			else if EventToAnalyse.SmartLinkEvent.RegisterName = "2110" or CondensateACRegisters.find(EventToAnalyse.SmartLinkEvent.RegisterName) > -1 
+
+			then {
+
+				/*Combine and Output*/
+				//spawn combineChecksConclusions(EventToAnalyse);					
+
+				//spawn processConclusion(EventToAnalyse,"Default","", "", false,true,false);
+
+				/*SensorChecks*/
+				spawn sensorQualityChecks(EventToAnalyse,false,true);
+
+				spawn processConclusion(EventToAnalyse,"CDR_1_1_1","", "", false,true,true,"","");	
+
+			}
+
+			/**Event received: Condensate Drain IC*/		
+
+			else if  CondensateICRegisters.find(EventToAnalyse.SmartLinkEvent.RegisterName) > -1
+
+			then {
+
+				/*SensorChecks*/
+				spawn sensorQualityChecks(EventToAnalyse,false,true);
+				spawn processConclusion(EventToAnalyse,"CDR_1_1_2","", "", false,true,true,"","");	
+
+			}
+
+
+			/**Event received: Condensate Drain IC*/
+			else if EventToAnalyse.SmartLinkEvent.RegisterName = "2195" 
+
+			then {
+
+				/*Combine and Output*/
+				//spawn combineChecksConclusions(EventToAnalyse);					
+
+				//spawn processConclusion(EventToAnalyse,"Default","", "", false,true,false);
+
+				/*SensorChecks*/
+				spawn sensorQualityChecks(EventToAnalyse,false,true);
+
+				spawn processConclusion(EventToAnalyse,"CDR_1_1_2","", "", false,true,true,"","");	
+
+			}
+
+			/**Event received: Element 1 outlet temp originator*/
+			else if EventToAnalyse.SmartLinkEvent.RegisterName = "1003"
+
+			then {
+
+
+				/*Combine and Output*/
+				//spawn combineChecksConclusions(EventToAnalyse);	
+
+				//spawn processConclusion(EventToAnalyse,"Default","", "", false,true,false);
+
+				/*SensorChecks*/
+				spawn sensorQualityChecks(EventToAnalyse,false,true);
+				/*CoolingChecks*/						
+				spawn coolingSystemCheckCombined(EventToAnalyse,false,true);
+
+				/*ColdStartCheck*/
+				spawn coldStartupCheck(EventToAnalyse,false,true);
+
+				/*OilSeparatorCheck*/
+				spawn oilSeparatorCheck(EventToAnalyse,false,true);
+				/*OilCoolerCheck*/
+				spawn oilCoolerCheck(EventToAnalyse,false,true);
+				/*OilPressureCheck*/
+				spawn oilPressureCheck7D(EventToAnalyse,false,true);				
+				/*InterCoolerCheck*/
+				spawn interCoolerPressureCheckEvent(EventToAnalyse,false,true);
+				spawn interCoolerPressureCheck7D(EventToAnalyse,false,true);
+
+
+
+
+
+				/*Combined check: COMB_0001  */
+
+				on checkResult(EventKey = EventToAnalyse.EventKey, RuleKey = "ICP_1_1_3" )within (10.0) 
+				   or checkResult(EventKey = EventToAnalyse.EventKey, RuleKey = "ICP_2_1_3" )within (10.0)
+				{
+					spawn processConclusion(EventToAnalyse,"COMB_0001","", "", false,true,true,"","");
+					if DEBUG then {print "CombinedCheck COMB_0001 triggered"; }				
+				}
+
+
+			}
+
+			/**Event received: Element 2 inlet temp originator*/
+			else if EventToAnalyse.SmartLinkEvent.RegisterName = "1004"
+
+			then {
+
+
+				/*Combine and Output*/
+				//spawn combineChecksConclusions(EventToAnalyse);	
+
+				//spawn processConclusion(EventToAnalyse,"Default","", "", false,true,false);
+
+				/*SensorChecks*/
+				spawn sensorQualityChecks(EventToAnalyse,false,true);
+				/*CoolingChecks*/						
+				spawn coolingSystemCheckCombined(EventToAnalyse,false,true);
+
+				/*ColdStartCheck*/
+				spawn coldStartupCheck(EventToAnalyse,false,true);
+				/*OilSeparatorCheck*/
+				spawn oilSeparatorCheck(EventToAnalyse,false,true);
+				/*OilCoolerCheck*/
+				spawn oilCoolerCheck(EventToAnalyse,false,true);
+				/*OilPressureCheck*/
+				spawn oilPressureCheck7D(EventToAnalyse,false,true);				
+				/*InterCoolerCheck*/
+				spawn interCoolerPressureCheckEvent(EventToAnalyse,false,true);
+				spawn interCoolerPressureCheck7D(EventToAnalyse,false,true);
+
+			}
+
+
+			/**Event received: Element 2 outlet temp originator*/
+			else if EventToAnalyse.SmartLinkEvent.RegisterName = "1005"
+
+			then {
+
+
+				/*Combine and Output*/
+				//spawn combineChecksConclusions(EventToAnalyse);	
+
+				//spawn processConclusion(EventToAnalyse,"Default","", "", false,true,false);
+
+				/*SensorChecks*/
+				spawn sensorQualityChecks(EventToAnalyse,false,true);
+				/*CoolingChecks*/						
+				spawn coolingSystemCheckCombined(EventToAnalyse,false,true);
+				/*ColdStartCheck*/
+				spawn coldStartupCheck(EventToAnalyse,false,true);
+				/*OilSeparatorCheck*/
+				spawn oilSeparatorCheck(EventToAnalyse,false,true);
+				/*OilCoolerCheck*/
+				spawn oilCoolerCheck(EventToAnalyse,false,true);
+				/*OilPressureCheck*/
+				spawn oilPressureCheck7D(EventToAnalyse,false,true);				
+				/*InterCoolerCheck*/
+				spawn interCoolerPressureCheckEvent(EventToAnalyse,false,true);
+				spawn interCoolerPressureCheck7D(EventToAnalyse,false,true);
+
+				/*Combined check COMB_0002*/
+				on checkResult(EventKey = EventToAnalyse.EventKey, RuleKey = "ICP_1_1_2" ) within (10.0) 
+				   or  checkResult(EventKey = EventToAnalyse.EventKey, RuleKey = "ICP_2_1_2" ) within (10.0)
+				{
+					spawn processConclusion(EventToAnalyse,"COMB_0002","", "", false,true,true,"","");	
+
+					if DEBUG then {print "CombinedCheck COMB_0002 triggered"; }
+
+				}
+			}
+
+
+
+			/**Event received: Element outlet originator*/
+			else if EventToAnalyse.SmartLinkEvent.RegisterName = "1008" or EventToAnalyse.SmartLinkEvent.RegisterName = "1001"
+
+			then {
+				//spawn combineChecksConclusions(EventToAnalyse);	
+
+				//spawn processConclusion(EventToAnalyse,"Default","", "", false,true,false);
+
+				/*SensorChecks*/
+				spawn sensorQualityChecks(EventToAnalyse,false,true);
+				/*CoolingChecks*/						
+				spawn coolingSystemCheckCombined(EventToAnalyse,false,true);
+				/*ColdStartCheck*/
+				spawn coldStartupCheck(EventToAnalyse,false,true);
+				/*OilSeparatorCheck*/
+				spawn oilSeparatorCheck(EventToAnalyse,false,true);
+				/*OilCoolerCheck*/
+				spawn oilCoolerCheck(EventToAnalyse,false,true);
+				/*OilPressureCheck*/
+				spawn oilPressureCheck7D(EventToAnalyse,false,true);
+				/*Check for clogged oil filter*/
+				spawn combinedCheck4(EventToAnalyse,false);
+			}
+
+			/**Event received: Cooling medium*/
+			else if EventToAnalyse.SmartLinkEvent.RegisterName = "1214" /*separate into model*/
+
+			then {
+				//spawn combineChecksConclusions(EventToAnalyse);	
+
+				//spawn processConclusion(EventToAnalyse,"Default","", "", false,true,false);
+
+				/*SensorChecks*/
+				spawn sensorQualityChecks(EventToAnalyse,false,true);
+				/*CoolingChecks*/						
+				spawn coolingSystemCheckCombined(EventToAnalyse,false,true);
+
+			}
+
+
+			/**Event received: Cooling Water Out originator*/
+			else if EventToAnalyse.SmartLinkEvent.RegisterName = "1207"
+
+			then {
+
+
+				/**Combine and Output*/
+				//spawn combineChecksConclusions(EventToAnalyse);	
+
+				//processConclusion(EventToAnalyse,"Default","", "", false,true,false);
+
+				/*SensorChecks*/
+				spawn sensorQualityChecks(EventToAnalyse,false,true);
+				/*CoolingChecks*/						
+				spawn coolingSystemCheckCombined(EventToAnalyse,false,true);
+
+			}
+
+			/**Event received: High dewpoint originator*/
+			else if EventToAnalyse.SmartLinkEvent.RegisterName = "2911"
+
+			then {
+				//	spawn combineChecksConclusions(EventToAnalyse);	
+
+				//spawn processConclusion(EventToAnalyse,"Default","", "", false,true,false);
+
+				/*SensorChecks*/
+				spawn sensorQualityChecks(EventToAnalyse,false,true);
+				/*CoolingChecks*/						
+				spawn coolingSystemCheckCombined(EventToAnalyse,false,true);
+			}
+
+			/**Event received: Dryer Lat*/
+			else if EventToAnalyse.SmartLinkEvent.RegisterName = "1010"
+
+			then {				
+
+				spawn sensorQualityChecks(EventToAnalyse,false,true);
+				/*CoolingChecks: INCLUDES AMBIENTAIRCHECK: NO NEED TO DEFINE IT AGAIN SEPERATELY*/						
+				spawn coolingSystemCheckCombined(EventToAnalyse,false,true);
+
+
+				on not checkResult(EventKey = EventToAnalyse.EventKey, Type = "AmbientAirCheck", CheckMatched = "Match" ) within (10.0) 
+
+				{
+					spawn processConclusion(EventToAnalyse,"COMB_0006","", "", false,true,true,"","");	
+
+					if DEBUG then {print "Result CombinedCheck COMB_0006 triggered"; }
+
+				}	
+
+
+			}	
+
+			/**Event received: Motor Converter fault*/
+			else if EventToAnalyse.SmartLinkEvent.RegisterName = "7385"
+
+			then {				
+
+				spawn sensorQualityChecks(EventToAnalyse,false,true);
+				spawn converterFaultsEvent(EventToAnalyse,false,true);
+
+			}
+
+			/**if no match*/
+			else /*if EventToAnalyse.SmartLinkEvent.EventName = "GeneralShutdown" or 
+			EventToAnalyse.SmartLinkEvent.EventName = "GeneralShutdownWarning"  or
+			EventToAnalyse.SmartLinkEvent.EventName = "GeneralWarning"  then*/
+			{
+				/*No check was defined for the specific originator*/
+				processConclusion(EventToAnalyse,"NoSpecificChecksDefinedYet","", "", false,true,false,"","");
+
+			}
+		}
+
+	}
+
+	/*Combined check: check for clogged oil cooler*/
+	action combinedCheck4(SmartLinkSensorCheckKey EventToAnalyse,boolean GeneralCheck) {
+
+		if DEBUG then {print "CombinedCheck COMB_0004 activated"; }
+
+		spawn oilInjectionPressureCheckEvent(EventToAnalyse,GeneralCheck,true);
+		spawn oilInjectionTempCheckEvent(EventToAnalyse,GeneralCheck,true);
+		spawn coolingSystemCheckCombined(EventToAnalyse,GeneralCheck,false);
+
+		on checkResult(EventKey = EventToAnalyse.EventKey, RuleKey = "OIP_1_1_2" ) within (10.0) 
+		   and  checkResult(EventKey = EventToAnalyse.EventKey, RuleKey = "OIT_1_1_2" ) within (10.0)
+		   and  checkResult(EventKey = EventToAnalyse.EventKey, RuleKey = "CSC_1_1_2" ) within (10.0)
+		{
+			spawn processConclusion(EventToAnalyse,"COMB_0004","", "", GeneralCheck,true,true,"","");	
+
+			if DEBUG then {print "Result CombinedCheck COMB_0004 triggered"; }
+
+		}	
+	}
+
+
+	/*General cooling system check*/
+	action coolingSystemCheckCombined(SmartLinkSensorCheckKey EventToAnalyse,boolean GeneralCheck,boolean OutputToDasbhoard) {
+
+		if DEBUG then {print "coolingSystemCheckCombined"; }
+
+		spawn coolingWaterInCheckEvent(EventToAnalyse,GeneralCheck,OutputToDasbhoard);
+		spawn ambientAirCheckEvent(EventToAnalyse,GeneralCheck,OutputToDasbhoard);
+		spawn coolingMediumCheckEvent(EventToAnalyse,GeneralCheck,OutputToDasbhoard);
+		spawn coolingWaterFlowCheckEvent(EventToAnalyse,GeneralCheck,OutputToDasbhoard);
+
+
+		on  checkResult(EventKey = EventToAnalyse.EventKey, Type = "AmbientAirCheck", CheckMatched = "Match" ) within (10.0) 
+		    or  checkResult(EventKey = EventToAnalyse.EventKey, Type = "CoolingWaterInCheck", CheckMatched = "Match"  ) within (10.0)
+		    or  checkResult(EventKey = EventToAnalyse.EventKey, Type = "CoolingMediumCheck", CheckMatched = "Match"  ) within (10.0)
+		    or  checkResult(EventKey = EventToAnalyse.EventKey, Type = "CoolingSystemFlowCheck", CheckMatched = "Match"  ) within (10.0)
+		{
+			spawn processConclusion(EventToAnalyse,"COMB_0005","", "", GeneralCheck,false,true,"","");	
+
+			if DEBUG then {print "Result CombinedCheck COMB_0005 triggered"; }
+
+		}
+
+	}
+
+
+	/**AmbientAirCheck: UseEventData  */
+	action ambientAirCheckEvent(SmartLinkSensorCheckKey EventToAnalyse,boolean GeneralCheck,boolean OutputToDatabaseAndDashboard)   {		
+		checkResult AnCo;		
+
+		if DEBUG = true then {
+			print "AmbientAirCheck";
+		}
+
+		RequestedAggregate AmbientTempEvent,CoolingAirInEvent;	
+
+
+		AmbientTempEvent := processMemStorRequests(EventToAnalyse.EventKey,EventToAnalyse.SmartLinkEvent.CommunicationToken,"1000", 0,"Event_SensorValues");
+		CoolingAirInEvent := processMemStorRequests(EventToAnalyse.EventKey,EventToAnalyse.SmartLinkEvent.CommunicationToken,"1200", 0,"Event_SensorValues");
+
+		if ( temperatureOk(AmbientTempEvent.registername,AmbientTempEvent.aggregatevalue) 
+
+				and   temperatureOk(CoolingAirInEvent.registername,CoolingAirInEvent.aggregatevalue)) then {
+
+
+			if ( AmbientTempEvent.aggregatevalue != -99.0   or  CoolingAirInEvent.aggregatevalue != -99.0 ) then {
+
+				if AmbientTempEvent.aggregatevalue > 35.0 + 273.16  or CoolingAirInEvent.aggregatevalue > 35.0 + 273.16
+				then {
+					processConclusion(EventToAnalyse,"AMB_1_1_1","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");
+				}
+				else if (AmbientTempEvent.aggregatevalue < 0.0 + 273.16 and AmbientTempEvent.aggregatevalue != -99.0) 
+					or 		(CoolingAirInEvent.aggregatevalue < 0.0 + 273.16 and CoolingAirInEvent.aggregatevalue != -99.0)
+				then {
+					processConclusion(EventToAnalyse,"AMB_1_1_3","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");
+				}
+				else
+				{
+					processConclusion(EventToAnalyse,"AMB_1_1_2","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");
+				}
+			}
+			else {
+				processConclusion(EventToAnalyse,"AMB_1_1_4","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");
+
+			}
+
+		} else {if DEBUG  then { print "SensorErrorDetected in AmbientAirCheck";} }
+	}
+
+
+	/**ConverterFaults: UseEventData  */
+	action converterFaultsEvent(SmartLinkSensorCheckKey EventToAnalyse,boolean GeneralCheck,boolean OutputToDatabaseAndDashboard)   {	
+		RequestedAggregate ConverterTypeIdValue,ConverterFaultCode;
+
+		if DEBUG = true then {
+			print "ConverterCheck started";
+		}
+
+
+		ConverterTypeIdValue := processMemStorRequests(EventToAnalyse.EventKey,EventToAnalyse.SmartLinkEvent.CommunicationToken,"8574", 0,"Event_SensorValues");
+		ConverterFaultCode := processMemStorRequests(EventToAnalyse.EventKey,EventToAnalyse.SmartLinkEvent.CommunicationToken,"8582", 0,"Event_SensorValues");
+
+		string CategoryId;
+		string ConverterType;
+		string ArticleId;
+
+		if DEBUG = true then {
+		print ConverterTypeIdValue.aggregatevalue.floor().toString() + " " +  ConverterTypeIdValue.toString() + " " + ConverterMasterData.toString();
+		}
+		
+		
+		if ConverterMasterData.hasKey(ConverterTypeIdValue.aggregatevalue.floor()) and ConverterFaultCodes.hasKey(ConverterTypeIdValue.aggregatevalue.toString() + ConverterFaultCode.aggregatevalue.toString()) then
+		
+		{
+			CategoryId := ConverterMasterData.getOrDefault(ConverterTypeIdValue.aggregatevalue.floor())[0];
+			ConverterType := ConverterMasterData.getOrDefault(ConverterTypeIdValue.aggregatevalue.floor())[1];
+			ArticleId := ConverterFaultCodes.getOrDefault(ConverterTypeIdValue.aggregatevalue.toString() + ConverterFaultCode.aggregatevalue.toString())[3];
+			processConclusion(EventToAnalyse,"CVTR_1_1_1","",ConverterType + ": ErrorCode: " + ConverterFaultCode.aggregatevalue.toString(), GeneralCheck,OutputToDatabaseAndDashboard,true,CategoryId,ArticleId);
+			
+			if DEBUG = true then {
+				print "CategoryId: " + CategoryId.toString();
+				print "ConverterType: " +  ConverterType.toString();
+				print "ArticleId: " + ArticleId.toString();
+				print "Converter ProcessConclusion sent.";
+				}
+			
+			
+		}
+		
+
+		else if ConverterMasterData.hasKey(ConverterTypeIdValue.aggregatevalue.floor()) then
+		
+		{
+			CategoryId := ConverterMasterData.getOrDefault(ConverterTypeIdValue.aggregatevalue.floor())[0];
+			ConverterType := ConverterMasterData.getOrDefault(ConverterTypeIdValue.aggregatevalue.floor())[1];
+			processConclusion(EventToAnalyse,"CVTR_1_1_1","",ConverterType + ": ErrorCode: " + ConverterFaultCode.aggregatevalue.toString(), GeneralCheck,OutputToDatabaseAndDashboard,true,CategoryId,"");
+			
+
+			if DEBUG = true then {
+				print "Converter ProcessConclusion sent. (no articleId)";
+				}			
+		}
+		
+		else {
+			
+			processConclusion(EventToAnalyse,"CVTR_1_1_1",""," No ConverterType available" + ": ErrorCode: " + ConverterFaultCode.aggregatevalue.toString(), GeneralCheck,OutputToDatabaseAndDashboard,true,"","");
+					
+		}
+		
+		
+		
+		
+	}
+
+
+	/**CoolingWaterInCheck: UseEventData  */
+	action coolingWaterInCheckEvent(SmartLinkSensorCheckKey EventToAnalyse,boolean GeneralCheck,boolean OutputToDatabaseAndDashboard)   {		
+		checkResult AnCo;		
+
+		if DEBUG = true then {
+			print "CoolingWaterInCheck";
+		}
+
+		RequestedAggregate AmbientTempEvent,CoolingWaterInEvent,CoolingMediumInEvent,CoolingAirInEvent;	
+
+
+		CoolingWaterInEvent := processMemStorRequests(EventToAnalyse.EventKey,EventToAnalyse.SmartLinkEvent.CommunicationToken,"1203", 0,"Event_SensorValues");
+
+		if (  
+				temperatureOk(CoolingWaterInEvent.registername,CoolingWaterInEvent.aggregatevalue)
+		) then {
+
+
+			if (   CoolingWaterInEvent.aggregatevalue != -99.0 ) then {
+
+				if  CoolingWaterInEvent.aggregatevalue > 35.0 + 273.16 
+				then {
+					processConclusion(EventToAnalyse,"CWI_1_1_1","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");
+				}
+				else if (CoolingWaterInEvent.aggregatevalue < 0.0 + 273.16 and  CoolingWaterInEvent.aggregatevalue != -99.0)
+
+					then {
+					processConclusion(EventToAnalyse,"CWI_1_1_3","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");
+				}
+				else
+				{
+					processConclusion(EventToAnalyse,"CWI_1_1_2","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");
+				}
+			}
+			else {
+				processConclusion(EventToAnalyse,"CWI_1_1_4","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");
+
+			}
+
+		} else {if DEBUG  then { print "SensorErrorDetected in CoolingWaterInCheck";} }
+	}
+
+
+	/**CoolingMediumCheck:   UseEventData  */
+	action coolingMediumCheckEvent(SmartLinkSensorCheckKey EventToAnalyse,boolean GeneralCheck,boolean OutputToDatabaseAndDashboard)   {		
+		checkResult AnCo;		
+
+		if DEBUG = true then {
+			print "CoolingMediumCheck";
+		}
+
+		RequestedAggregate CoolingMediumInEvent;
+
+
+
+		CoolingMediumInEvent := processMemStorRequests(EventToAnalyse.EventKey,EventToAnalyse.SmartLinkEvent.CommunicationToken,"1214", 0,"Event_SensorValues");
+
+
+		if temperatureOk(CoolingMediumInEvent.registername,CoolingMediumInEvent.aggregatevalue)  
+		then {
+
+
+			if (  CoolingMediumInEvent.aggregatevalue != -99.0 ) then {
+
+				if  CoolingMediumInEvent.aggregatevalue > 35.0 + 273.16 
+				then {
+					processConclusion(EventToAnalyse,"CLM_1_1_1","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");
+				}
+				else if (CoolingMediumInEvent.aggregatevalue < 0.0 + 273.16 and CoolingMediumInEvent.aggregatevalue != -99.0)
+					then {
+					processConclusion(EventToAnalyse,"CLM_1_1_3","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");
+				}
+				else
+				{
+					processConclusion(EventToAnalyse,"CLM_1_1_2","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");
+				}
+			}
+			else {
+				processConclusion(EventToAnalyse,"CLM_1_1_4","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");
+
+			}
+
+		} else {if DEBUG  then { print "SensorErrorDetected in CoolingMediumCheck";} }
+	}
+
+
+
+
+	/**CoolingSystemFlowCheck: 1.1 Sufficient flow? Clogged system?  UseEventData  */
+	action coolingWaterFlowCheckEvent(SmartLinkSensorCheckKey EventToAnalyse,boolean GeneralCheck,boolean OutputToDatabaseAndDashboard)  {		
+		checkResult AnCo;		
+
+		if DEBUG = true then {
+			print "fase2 CoolingWaterCheck";
+		}		
+
+		RequestedAggregate CoolingWaterInLoadedEvent,CoolingWaterOutLoadedEvent;	
+
+		CoolingWaterInLoadedEvent := processMemStorRequests(EventToAnalyse.EventKey,EventToAnalyse.SmartLinkEvent.CommunicationToken,"1203", 0,"Event_SensorValues");
+		CoolingWaterOutLoadedEvent := processMemStorRequests(EventToAnalyse.EventKey,EventToAnalyse.SmartLinkEvent.CommunicationToken,"1207", 0,"Event_SensorValues");
+
+		if DEBUGCooling then {  print "DEBUGCOOLING 4." + CoolingWaterOutLoadedEvent.toString() + "SensorOk? CoolingWaterOutLoaded: " + temperatureOk(CoolingWaterOutLoadedEvent.registername,CoolingWaterOutLoadedEvent.aggregatevalue).toString();}
+		if DEBUGCooling then {  print "DEBUGCOOLING 5." + CoolingWaterOutLoadedEvent.toString() + "SensorOk? CoolingWaterInLoaded: " + temperatureOk(CoolingWaterInLoadedEvent.registername,CoolingWaterInLoadedEvent.aggregatevalue ).toString();}
+
+
+		if ( temperatureOk(CoolingWaterOutLoadedEvent.registername,CoolingWaterOutLoadedEvent.aggregatevalue) and temperatureOk(CoolingWaterInLoadedEvent.registername,CoolingWaterInLoadedEvent.aggregatevalue ) ) then {
+
+			if ( CoolingWaterOutLoadedEvent.aggregatevalue != -99.0   and  CoolingWaterInLoadedEvent.aggregatevalue != -99.0  ) then {
+
+				if CoolingWaterOutLoadedEvent.aggregatevalue - CoolingWaterInLoadedEvent.aggregatevalue > 10.0
+				then {
+
+					if DEBUG then {print "CoolingSystemClogged" + CoolingWaterOutLoadedEvent.aggregatevalue.toString() + CoolingWaterInLoadedEvent.aggregatevalue.toString() ;}
+					processConclusion(EventToAnalyse,"CSF_1_1_2","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");
+				}
+				else {
+
+					if DEBUG then {	print "CoolingSystemOK" + CoolingWaterOutLoadedEvent.aggregatevalue.toString() + CoolingWaterInLoadedEvent.aggregatevalue.toString() ; }
+					processConclusion(EventToAnalyse,"CSF_1_1_1","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");
+				}
+			}
+
+			else {
+				if DEBUG  then { print "InSufficientData" ;}
+				processConclusion(EventToAnalyse,"CSF_1_1_3","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");
+
+			}
+
+		} else {if DEBUG  then { print "SensorErrorDetected in check";}}
+
+	}
+
+
+
+	/**CoolingSystemFlowCheck: 2.1 Sufficient flow? Clogged system?  UseAggregatesData  */	
+	action coolingWaterFlowCheck7D(SmartLinkSensorCheckKey EventToAnalyse,boolean GeneralCheck,boolean OutputToDatabaseAndDashboard)   {		
+		checkResult AnCo;
+
+
+
+		if DEBUG = true then {
+			print "fase2 CoolingWaterCheck";
+		}
+
+
+		RequestedAggregate CoolingWaterInLoaded7D,CoolingWaterOutLoaded7D;	
+
+		CoolingWaterInLoaded7D := processMemStorRequests(EventToAnalyse.EventKey,EventToAnalyse.SmartLinkEvent.CommunicationToken,"1203", 7,"SSIS_Aggregates");
+		CoolingWaterOutLoaded7D := processMemStorRequests(EventToAnalyse.EventKey,EventToAnalyse.SmartLinkEvent.CommunicationToken,"1207", 7,"SSIS_Aggregates");			
+
+
+		if ( temperatureOk(CoolingWaterOutLoaded7D.registername,CoolingWaterOutLoaded7D.aggregatevalue) and temperatureOk(CoolingWaterInLoaded7D.registername,CoolingWaterInLoaded7D.aggregatevalue ) ) then {
+
+			if ( CoolingWaterOutLoaded7D.aggregatevalue != -99.0   and  CoolingWaterInLoaded7D.aggregatevalue != -99.0  ) then {
+
+				if CoolingWaterOutLoaded7D.aggregatevalue - CoolingWaterInLoaded7D.aggregatevalue > 10.0
+				then {
+
+					print "CoolingSystemClogged" + CoolingWaterOutLoaded7D.aggregatevalue.toString() + CoolingWaterInLoaded7D.aggregatevalue.toString() ;
+					processConclusion(EventToAnalyse,"CSF_2_1_1","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");	
+				}
+				else {
+
+					print "CoolingSystemOK" + CoolingWaterOutLoaded7D.aggregatevalue.toString() + CoolingWaterInLoaded7D.aggregatevalue.toString();
+					processConclusion(EventToAnalyse,"CSF_2_1_2","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");	
+				}
+			}
+
+			else {
+				if DEBUG then {	if DEBUG  then { print "InSufficientData" ; }}
+				processConclusion(EventToAnalyse,"CSF_2_1_3","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");	
+			}
+
+		} else {if DEBUG  then { print "SensorErrorDetected in check";} }
+
+	}
+
+
+
+
+	/** OilPressure: 1.1 Startup phase? Cooling medium too cold?  UseEventData  */	
+
+	action coldStartupCheck(SmartLinkSensorCheckKey EventToAnalyse,boolean GeneralCheck,boolean OutputToDatabaseAndDashboard) {		
+		checkResult AnCo;
+		RequestedAggregate OilPressureLoaded7D,OilPressureLoaded1H,ElementOutletEvent,Element1OutletEvent;
+
+
+		if DEBUG = true then {
+			print "coldStartupCheck active";
+		}
+
+
+		Element1OutletEvent := processMemStorRequests(EventToAnalyse.EventKey,EventToAnalyse.SmartLinkEvent.CommunicationToken,"1003", 0,"Event_SensorValues");	
+		ElementOutletEvent := processMemStorRequests(EventToAnalyse.EventKey,EventToAnalyse.SmartLinkEvent.CommunicationToken,"1008", 0,"Event_SensorValues");
+
+
+		if DEBUG then {print "ELEMENT1OUTLETVALUE:" + Element1OutletEvent.toString();}
+		if DEBUG then {print "ELEMENTOUTLETVALUE:" + ElementOutletEvent.toString();}
+
+		if ( temperatureOk(ElementOutletEvent.registername,ElementOutletEvent.aggregatevalue)   and   temperatureOk(ElementOutletEvent.registername,Element1OutletEvent.aggregatevalue) ) then {
+
+
+			if ( ElementOutletEvent.aggregatevalue != -99.0   or  Element1OutletEvent.aggregatevalue != -99.0  ) then {
+
+
+				if (ElementOutletEvent.aggregatevalue < 60.0 + 273.16  and ElementOutletEvent.aggregatevalue != -99.0)   or  (Element1OutletEvent.aggregatevalue < 60.0 + 273.16 and Element1OutletEvent.aggregatevalue != -99.0) /*60° + 273*/
+				then {
+
+					processConclusion(EventToAnalyse,"SF_1_1_1","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");
+
+				}
+				else {
+
+					processConclusion(EventToAnalyse,"SF_1_1_2","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");
+				}
+
+			}
+
+			else {
+
+				if DEBUG  then { print "InSufficientData" ;}
+
+				processConclusion(EventToAnalyse,"SF_1_1_3","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");
+
+			}
+		} else {if DEBUG  then { print "SensorErrorDetected in check";}}
+
+	}
+
+	/**1.1 Intercooler pressure within limits? UseEventData  */
+	action interCoolerPressureCheckEvent(SmartLinkSensorCheckKey EventToAnalyse,boolean GeneralCheck,boolean OutputToDatabaseAndDashboard)  {		
+		checkResult AnCo;	
+
+
+		if DEBUG = true then {
+			print "fase2 InterCoolerPressureCheck";
+		}
+
+
+
+		RequestedAggregate InterCoolerPressureEvent;	
+
+
+		InterCoolerPressureEvent := processMemStorRequests(EventToAnalyse.EventKey,EventToAnalyse.SmartLinkEvent.CommunicationToken,"511", 0,"Event_SensorValues");
+
+
+		if DEBUGCooling then {  print "DEBUGInterCooler 1." + InterCoolerPressureEvent.toString() + "SensorOk? InterCoolerPressureEvent : " + pressureOk(InterCoolerPressureEvent.registername,InterCoolerPressureEvent.aggregatevalue).toString();}
+
+
+		if ( pressureOk(InterCoolerPressureEvent.registername,InterCoolerPressureEvent.aggregatevalue)   ) then {
+
+
+			if ( InterCoolerPressureEvent.aggregatevalue != -99.0 ) then {
+
+				if (InterCoolerPressureEvent.aggregatevalue < 180000.0) 
+					then {
+					if DEBUG then {print "InterCoolerPressureTooLow" + InterCoolerPressureEvent.aggregatevalue.toString();}
+					processConclusion(EventToAnalyse,"ICP_1_1_2","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");
+
+				}
+				else if (InterCoolerPressureEvent.aggregatevalue > 320000.0 ) 
+
+					then {
+					if DEBUG then {print "InterCoolerPressureTooHigh" + InterCoolerPressureEvent.aggregatevalue.toString();}
+					processConclusion(EventToAnalyse,"ICP_1_1_3","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");
+				}
+				else
+				{
+
+					if DEBUG then {	print "InterCoolerPressureOk" + InterCoolerPressureEvent.aggregatevalue.toString() ; }
+					processConclusion(EventToAnalyse,"ICP_1_1_1","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");
+				}
+			}
+			else {
+
+
+				if DEBUG  then { print "InSufficientData" ;}
+				processConclusion(EventToAnalyse,"ICP_1_1_4","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");
+			}
+
+		}
+		else {if DEBUG  then { print "SensorErrorDetected in check";}}
+
+	}
+
+	/**2.1 Intercooler pressure within limits?  UseAggregatesData  */
+	action interCoolerPressureCheck7D(SmartLinkSensorCheckKey EventToAnalyse,boolean GeneralCheck,boolean OutputToDatabaseAndDashboard)   {		
+		checkResult AnCo;		
+
+
+		if DEBUG = true then {
+			print "fase2 InterCoolerPressureCheck";
+		}		
+
+
+		RequestedAggregate InterCoolerPressure7D;	
+
+
+		InterCoolerPressure7D := processMemStorRequests(EventToAnalyse.EventKey,EventToAnalyse.SmartLinkEvent.CommunicationToken,"511", 7,"SSIS_Aggregates");
+
+
+		if DEBUGCooling then {  print "DEBUGInterCooler 1." + InterCoolerPressure7D.toString() + "SensorOk? InterCoolerPressure7D: " + pressureOk(InterCoolerPressure7D.registername,InterCoolerPressure7D.aggregatevalue).toString();}
+
+
+		if ( pressureOk(InterCoolerPressure7D.registername,InterCoolerPressure7D.aggregatevalue)   ) then {
+
+
+			if ( InterCoolerPressure7D.aggregatevalue != -99.0 ) then {
+
+				if InterCoolerPressure7D.aggregatevalue < 180000.0 
+				then {
+
+					if DEBUG then {print "InterCoolerPressureTooLow" + InterCoolerPressure7D.aggregatevalue.toString();}
+					processConclusion(EventToAnalyse,"ICP_2_1_2","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");
+
+				}
+				else if (InterCoolerPressure7D.aggregatevalue > 320000.0 ) 
+
+					then {
+					if DEBUG then {print "InterCoolerPressureTooHigh" + InterCoolerPressure7D.aggregatevalue.toString();}
+					processConclusion(EventToAnalyse,"ICP_2_1_3","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");
+
+				}
+				else
+				{
+					if DEBUG then {	print "InterCoolerPressureOk" + InterCoolerPressure7D.aggregatevalue.toString() ; }
+					processConclusion(EventToAnalyse,"ICP_2_1_1","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");
+				}
+			}
+			else {
+				if DEBUG  then { print "InSufficientData" ; }
+				processConclusion(EventToAnalyse,"ICP_2_1_4","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");
+			}
+
+		} else {if DEBUG  then { print "SensorErrorDetected in check";}}
+
+
+	}	
+
+
+
+	/** OilPressure: 2.1 Oil pressure dropping?  UseAggregates  */
+
+	action oilPressureCheck7D (SmartLinkSensorCheckKey EventToAnalyse,boolean GeneralCheck,boolean OutputToDatabaseAndDashboard)   {		
+		checkResult AnCo;
+		RequestedAggregate OilPressureLoaded7D,OilPressureLoaded1H;
+
+
+		if DEBUG = true then {
+			print "fase2 OilPressurecheck";
+		}
+
+		OilPressureLoaded7D := processMemStorRequests(EventToAnalyse.EventKey,EventToAnalyse.SmartLinkEvent.CommunicationToken,"605", 7,"SSIS_Aggregates");
+		OilPressureLoaded1H := processMemStorRequests(EventToAnalyse.EventKey,EventToAnalyse.SmartLinkEvent.CommunicationToken,"605", 3600,"SSIS_Aggregates");
+
+
+		if ( pressureOk(OilPressureLoaded7D.registername,OilPressureLoaded7D.aggregatevalue)   and   pressureOk(OilPressureLoaded1H.registername,OilPressureLoaded1H.aggregatevalue) ) then {
+
+
+			if ( OilPressureLoaded7D.aggregatevalue != -99.0   and  OilPressureLoaded1H.aggregatevalue != -99.0  ) then {
+
+
+				if OilPressureLoaded7D.aggregatevalue - OilPressureLoaded1H.aggregatevalue > 50000.0
+				then {
+
+					if DEBUG then { print "OilPressureDropping" + OilPressureLoaded7D.aggregatevalue.toString() + OilPressureLoaded1H.aggregatevalue.toString() ; }
+					processConclusion(EventToAnalyse,"OP_2_1_1","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");
+				}
+				else					if DEBUG then {	print "OilPressureOK" + OilPressureLoaded7D.aggregatevalue.toString() + OilPressureLoaded1H.aggregatevalue.toString() ;}
+				processConclusion(EventToAnalyse,"OP_2_1_2","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");
+			}
+			else {				
+				if DEBUG  then { print "InSufficientData"; } 				
+				processConclusion(EventToAnalyse,"OP_2_1_3","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");}
+		}
+		else { if DEBUG  then { print "SensorErrorDetected in check";} }
+	}
+
+
+	/**Dp OilSeparator*/
+	action oilSeparatorCheck(SmartLinkSensorCheckKey EventToAnalyse,boolean GeneralCheck,boolean OutputToDatabaseAndDashboard)   {		
+		checkResult AnCo;
+		RequestedAggregate OilSeparatorOnEvent;
+
+
+		if DEBUG = true then {
+			print "fase3 OilSeparatorCheck";
+		}
+
+		/**1.1 Check if dp oil separator is within range.  */	
+
+		OilSeparatorOnEvent := processMemStorRequests(EventToAnalyse.EventKey,EventToAnalyse.SmartLinkEvent.CommunicationToken,"602", 0,"Event_SensorValues");	
+
+
+		if ( pressureOk(OilSeparatorOnEvent.registername,OilSeparatorOnEvent.aggregatevalue) ) then {
+
+
+			if ( OilSeparatorOnEvent.aggregatevalue != -99.0 ) then {
+
+
+				if OilSeparatorOnEvent.aggregatevalue > 70000.0
+				then {
+
+					processConclusion(EventToAnalyse,"DPOS_1_1_2","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");
+
+				}
+				else {
+
+					processConclusion(EventToAnalyse,"DPOS_1_1_1","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");
+				}
+
+			}
+
+			else {
+				if DEBUG  then { print "InSufficientData" ; }
+				processConclusion(EventToAnalyse,"DPOS_1_1_3","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");
+			}	
+
+		} else { if DEBUG  then { print "SensorErrorDetected in check";} }
+
+	}
+
+
+	/**OilInjectionPressureCheck: 1.1 Sufficient pressure? Clogged system?  UseEventData  */
+	action oilInjectionPressureCheckEvent(SmartLinkSensorCheckKey EventToAnalyse,boolean GeneralCheck,boolean OutputToDatabaseAndDashboard)  {		
+		checkResult AnCo;		
+
+		if DEBUG = true then {
+			print "fase2 oilInjectionCheckEvent";
+		}		
+
+		RequestedAggregate CompressorOutletPressure,OilInjectionPressure;	
+
+		CompressorOutletPressure := processMemStorRequests(EventToAnalyse.EventKey,EventToAnalyse.SmartLinkEvent.CommunicationToken,"509", 0,"Event_SensorValues");
+		OilInjectionPressure := processMemStorRequests(EventToAnalyse.EventKey,EventToAnalyse.SmartLinkEvent.CommunicationToken,"604", 0,"Event_SensorValues");
+
+		if DEBUGCooling then {  print "DEBUGOILINJECTIONPRESS " + CompressorOutletPressure.toString() + "SensorOk? CompressorOuletPressure: " + pressureOk(CompressorOutletPressure.registername,CompressorOutletPressure.aggregatevalue).toString();}
+		if DEBUGCooling then {  print "DEBUGOILINJECTIONPRESS." + OilInjectionPressure.toString() + "SensorOk? CoolingWaterInLoaded: " + pressureOk(OilInjectionPressure.registername,OilInjectionPressure.aggregatevalue ).toString();}
+
+
+		if ( pressureOk(CompressorOutletPressure.registername,CompressorOutletPressure.aggregatevalue) and pressureOk(OilInjectionPressure.registername,OilInjectionPressure.aggregatevalue ) ) then {
+
+			if ( CompressorOutletPressure.aggregatevalue != -99.0   and  OilInjectionPressure.aggregatevalue != -99.0  ) then {
+
+				if  (OilInjectionPressure.aggregatevalue < (CompressorOutletPressure.aggregatevalue - 400000.0))
+					then {
+
+					if DEBUG then {print "OilInjectionPressureTooLow" + CompressorOutletPressure.aggregatevalue.toString() + OilInjectionPressure.aggregatevalue.toString() ;}
+					processConclusion(EventToAnalyse,"OIP_1_1_2","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");
+				}
+				else {
+
+					if DEBUG then {	print "OilInjectionPressureOK" + CompressorOutletPressure.aggregatevalue.toString() + OilInjectionPressure.aggregatevalue.toString() ; }
+					processConclusion(EventToAnalyse,"OIP_1_1_1","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");
+				}
+			}
+
+			else {
+				if DEBUG then {print "InSufficientData" ; }
+				processConclusion(EventToAnalyse,"OIP_1_1_3","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");
+
+			}
+
+		} else { if DEBUG  then { print "SensorErrorDetected in check";} }
+
+	}
+
+
+	/**OilInjectionTemperatureCheck: 1.1 Temperature high enough?  UseEventData  */
+	action oilInjectionTempCheckEvent(SmartLinkSensorCheckKey EventToAnalyse,boolean GeneralCheck,boolean OutputToDatabaseAndDashboard)  {		
+		checkResult AnCo;		
+
+		if DEBUG = true then {
+			print "fase2 oilInjectionTempCheckEvent";
+		}		
+
+		RequestedAggregate OilInjectionTemperature;	
+
+		OilInjectionTemperature := processMemStorRequests(EventToAnalyse.EventKey,EventToAnalyse.SmartLinkEvent.CommunicationToken,"1106", 0,"Event_SensorValues");
+
+		if DEBUGCooling then {  print "DEBUGOILINJECTIONTEMP " + OilInjectionTemperature.toString() + "SensorOk? OilInjectionTemperature: " + temperatureOk(OilInjectionTemperature.registername,OilInjectionTemperature.aggregatevalue).toString();}
+
+
+		if (  temperatureOk(OilInjectionTemperature.registername,OilInjectionTemperature.aggregatevalue ) ) then {
+
+			if ( OilInjectionTemperature.aggregatevalue != -99.0   ) then {
+
+				if  (OilInjectionTemperature.aggregatevalue >  273.0 + 75.0)
+					then {
+
+					if DEBUG then {print "OilInjectionTempTooHigh" + OilInjectionTemperature.aggregatevalue.toString();}
+					processConclusion(EventToAnalyse,"OIT_1_1_2","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");
+				}
+				else {
+
+					if DEBUG then {	print "OilInjectionTempOK" + OilInjectionTemperature.aggregatevalue.toString(); }
+					processConclusion(EventToAnalyse,"OIT_1_1_1","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");
+				}
+			}
+
+			else {
+				if DEBUG  then { print "InSufficientData" ; }
+				processConclusion(EventToAnalyse,"OIT_1_1_3","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");
+
+			}
+
+		} else {if DEBUG  then { print "SensorErrorDetected in check";} }
+
+	}
+
+
+	/**Dp OilCooler*/
+	action oilCoolerCheck(SmartLinkSensorCheckKey EventToAnalyse,boolean GeneralCheck,boolean OutputToDatabaseAndDashboard)   {		
+		checkResult AnCo;
+		RequestedAggregate OilFilterOnEvent;
+
+
+		if DEBUG  then {
+			print "fase3 OilCoolerCheck";
+		}
+
+		/**1.1 Check if dp oil filter is within range.  */	
+
+		OilFilterOnEvent := processMemStorRequests(EventToAnalyse.EventKey,EventToAnalyse.SmartLinkEvent.CommunicationToken,"601", 0,"Event_SensorValues");	
+
+
+		if ( pressureOk(OilFilterOnEvent.registername,OilFilterOnEvent.aggregatevalue) ) then {
+
+
+			if ( OilFilterOnEvent.aggregatevalue != -99.0 ) then {
+
+
+				if OilFilterOnEvent.aggregatevalue < 90000.0
+				then {
+
+					processConclusion(EventToAnalyse,"DPOF_1_1_1","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");
+
+				}
+				else {
+
+					processConclusion(EventToAnalyse,"DPOF_1_1_2","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");
+				}
+
+			}
+
+			else {
+
+				if DEBUG  then { print "InSufficientData" ; }
+				processConclusion(EventToAnalyse,"DPOF_1_1_3","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");
+
+			}
+		} else { if DEBUG  then { print "SensorErrorDetected in check"; }}
+	}
+
+
+
+
+
+
+
+
+	/**Regeneration air inlet/outlet check*/
+	action regenerationAirTempCheck(SmartLinkSensorCheckKey EventToAnalyse,boolean GeneralCheck,boolean OutputToDatabaseAndDashboard)   {
+
+
+		RequestedAggregate RegenerationAirOutletEvent,RegenerationAirInletEvent;	
+
+		RegenerationAirOutletEvent := processMemStorRequests(EventToAnalyse.EventKey,EventToAnalyse.SmartLinkEvent.CommunicationToken,"1017", 0,"Event_SensorValues");
+		RegenerationAirInletEvent := processMemStorRequests(EventToAnalyse.EventKey,EventToAnalyse.SmartLinkEvent.CommunicationToken,"1019", 0,"Event_SensorValues");
+
+
+		if ( temperatureOk(RegenerationAirOutletEvent.registername,RegenerationAirOutletEvent.aggregatevalue) and temperatureOk(RegenerationAirInletEvent.registername,RegenerationAirInletEvent.aggregatevalue ) ) then {
+
+
+			if ( RegenerationAirOutletEvent.aggregatevalue != -99.0   and  RegenerationAirInletEvent.aggregatevalue != -99.0  ) then {
+
+				if RegenerationAirOutletEvent.aggregatevalue < 120.0 +273.16  or   RegenerationAirInletEvent.aggregatevalue < 120.0 +273.16
+				then {
+
+					if DEBUG then { print "RegenerationAirTempTooLow" + RegenerationAirOutletEvent.aggregatevalue.toString() + RegenerationAirInletEvent.aggregatevalue.toString() ;}
+					processConclusion(EventToAnalyse,"RAT_1_1_2","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");					
+
+				}
+
+				else if RegenerationAirOutletEvent.aggregatevalue > 200.0 +273.16  or   RegenerationAirInletEvent.aggregatevalue > 200.0 +273.16
+				then {
+
+					if DEBUG then { print "RegenerationAirTempTooHigh" + RegenerationAirOutletEvent.aggregatevalue.toString() + RegenerationAirInletEvent.aggregatevalue.toString() ;}
+					processConclusion(EventToAnalyse,"RAT_1_2_2","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");
+				}
+				else {
+					if DEBUG then  { print "RegenerationAirTempOK" + RegenerationAirOutletEvent.aggregatevalue.toString() + RegenerationAirInletEvent.aggregatevalue.toString() ;}
+					processConclusion(EventToAnalyse,"RAT_1_1_1","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");
+				}
+			}
+
+			else {
+				if DEBUG then  {print "InSufficientData" ; }
+				processConclusion(EventToAnalyse,"RAT_1_1_3","", "", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");	
+
+			}		
+
+		} else {if DEBUG  then { print "SensorErrorDetected in check";} }
+	}
+
+	/**Check if any sensor problems exist*/
+	action sensorQualityChecks(SmartLinkSensorCheckKey EventToAnalyse,boolean GeneralCheck,boolean OutputToDatabaseAndDashboard){
+
+		if DEBUG then { print "SENSORQUALITY CHECKS: enabled. Generalcheck: " + GeneralCheck.toString(); }
+
+		string i;
+		RequestedAggregate Sensor;
+
+		if GeneralCheck then {
+
+			for i in SensorValues.getOrDefault(EventToAnalyse.EventKey).keys() {
+
+
+				/**1.1 Pressure sensor error check*/
+				if RegisterConversion.getOrDefault(i)[3] = "Pressure"  or RegisterConversion.getOrDefault(i)[3] = "Low Pressure"  then {
+
+					Sensor := processMemStorRequests(EventToAnalyse.EventKey,EventToAnalyse.SmartLinkEvent.CommunicationToken,i, 0,"Event_SensorValues");	
+					if Sensor.aggregatevalue != -99.0 then {			
+
+						if not pressureOk(i,Sensor.aggregatevalue) 
+
+						then {  processConclusion(EventToAnalyse,"SC_1_1_1",i, i + " (" + RegisterConversion.getOrDefault(i)[1] + ")", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");
+						}				
+					}
+				}
+
+
+				/**1.2 Temperature sensor error check*/			
+				else if RegisterConversion.getOrDefault(i)[3] = "Temperature" then {
+
+					Sensor := processMemStorRequests(EventToAnalyse.EventKey,EventToAnalyse.SmartLinkEvent.CommunicationToken,i, 0,"Event_SensorValues");	
+					if Sensor.aggregatevalue != -99.0 then {			
+
+						if not	temperatureOk(i,Sensor.aggregatevalue) 
+
+						then { processConclusion(EventToAnalyse,"SC_1_2_1",i, i + " (" + RegisterConversion.getOrDefault(i)[1] + ")", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");
+						}
+					}
+				}	
+			}
+		}
+
+		else {
+
+
+			/**1.1 Check if originating pressure sensor is within range*/
+			if RegisterConversion.getOrDefault(EventToAnalyse.SmartLinkEvent.RegisterName)[3] = "Pressure" or RegisterConversion.getOrDefault(EventToAnalyse.SmartLinkEvent.RegisterName)[3] = "Low Pressure"  then {
+
+				if not pressureOk(EventToAnalyse.SmartLinkEvent.RegisterName,EventToAnalyse.SmartLinkEvent.Sensorvalue.toFloat()) 
+
+				then { processConclusion(EventToAnalyse,"SC_1_1_1",EventToAnalyse.SmartLinkEvent.RegisterName, EventToAnalyse.SmartLinkEvent.RegisterName + " (" + RegisterConversion.getOrDefault(EventToAnalyse.SmartLinkEvent.RegisterName)[1] + ")", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");
+
+				}
+			}		
+
+			/**1.2 Check if originating temperature sensor is within range*/
+			if RegisterConversion.getOrDefault(EventToAnalyse.SmartLinkEvent.RegisterName)[3] = "Temperature" then {
+				if 	not temperatureOk(EventToAnalyse.SmartLinkEvent.RegisterName,EventToAnalyse.SmartLinkEvent.Sensorvalue.toFloat()) 
+
+				then { processConclusion(EventToAnalyse,"SC_1_2_1",EventToAnalyse.SmartLinkEvent.RegisterName, EventToAnalyse.SmartLinkEvent.RegisterName + " (" + RegisterConversion.getOrDefault(EventToAnalyse.SmartLinkEvent.RegisterName)[1] + ")", GeneralCheck,OutputToDatabaseAndDashboard,true,"","");
+
+				}
+			}
+		}
+
+	}
+
+
+	/** AddConclusion to Event_Conclusions table & route to CombineConclusions*/
+
+	action processConclusion(SmartLinkSensorCheckKey EventToAnalyse,string RuleKey, string RuleKeyExtension, string AdditionalInfo, boolean GeneralCheck,boolean OutputToDatabaseAndDashboard, boolean IsSensorCheck, string DezideId1 , string DezideId2){ 
+		SmartLinkOutputDefinition def;
+
+		/*Get levels & eventinfo*/
+		def :=  getDetailedRuleDefinitionOutput(EventToAnalyse.SmartLinkEvent.EventName,EventToAnalyse.SmartLinkEvent.RegisterName,RuleKey,IsSensorCheck);
+
+		if DEBUG then {
+			
+			print def.toString();
+			
+		}
+		
+		
+		/*AddRegisterName to make RuleKey unique per checked sensor*/
+		if RuleKeyExtension != "" then 
+		{RuleKeyExtension := "_" + RuleKeyExtension; }
+
+		/*Output to dashboard & database or route back conclusion only*/
+		checkResult CheckResult;		
+
+		CheckResult := checkResult(EventToAnalyse.EventKey,EventToAnalyse.SmartLinkEvent.CommunicationToken,RuleKey + RuleKeyExtension,def.CheckMatched,def.RuleSet,def.BasicEventInfo + AdditionalInfo,def.OutputLevel1,def.OutputLevel2,def.EventInfo + " " + AdditionalInfo, GeneralCheck,OutputToDatabaseAndDashboard,IsSensorCheck,DezideId1,DezideId2);
+		route(CheckResult);
+
+		if OutputToDatabaseAndDashboard then {			
+			writeOutputToConclusionsTable(CheckResult);
+		}		
+	}
+
+	/** Write Output to conclusions table */
+	action writeOutputToConclusionsTable(checkResult CheckResult) {
+
+		if DEBUG then {	print "AddConclusion to Event_Conclusions table" + CheckResult.toString();}
+
+		Table tblEventConclusions := ConclusionsStore.open("Event_Conclusions");
+		string EventConclusionKey := CheckResult.RuleKey + "#" + CheckResult.Type + "#" + CheckResult.EventKey; 
+
+		Row r:= tblEventConclusions.get(EventConclusionKey);
+
+		r.setString("eventkey",CheckResult.EventKey);
+		r.setString("communicationtoken",CheckResult.CommunicationToken);
+		r.setString("ruleid",CheckResult.RuleKey);
+		r.setString("type",CheckResult.Type);
+		r.setString("conclusion",CheckResult.Conclusion);
+		r.setString("level1", CheckResult.level1);	
+		r.setString("level2", CheckResult.level2);
+		r.setString("eventinfo", CheckResult.EventInfo);
+		r.setBoolean("GeneralCheck",CheckResult.GeneralCheck);
+		r.setInteger("insertedon",currentTime.floor());
+		r.setString("dezideid1",CheckResult.DezideId1);
+		r.setString("dezideid2",CheckResult.DezideId2);
+		r.commit();
+		integer id := tblEventConclusions.persist();                		
+
+
+		/*OutputContentsToDatabase*/	
+
+			route com.atlascopco.ctsconnectivity.OutputConclusionToDatabase(
+
+			                            CheckResult.EventKey
+			                           ,CheckResult.CommunicationToken
+			                           ,CheckResult.RuleKey
+			                           ,CheckResult.Type
+			                           ,CheckResult.Conclusion
+			                           ,CheckResult.CheckMatched
+			                           ,CheckResult.level1
+			                           ,CheckResult.level2
+			                           ,CheckResult.EventInfo
+			                           ,CheckResult.GeneralCheck.toString()
+			                           ,CheckResult.DezideId1
+			                           ,CheckResult.DezideId2
+			                           ,currentTime.floor()		
+			);
+	}
+
+	/** Combine Conclusions from individual checks and select the most important */
+	action combineResults(SmartLinkSensorCheckKey EventToAnalyse) {
+
+		MatchedEventReceived := false;
+		checkResult CheckResult;
+		CombineResultReady :=false;
+
+		//if DEBUG then {print "combinechecksactivated" + EventToAnalyse.toString();}
+
+		on all checkResult(EventKey = EventToAnalyse.EventKey,OutputToDatabaseAndDashboard = true ):CheckResult within(10.1){
+
+
+			if (  CheckResult.RuleKey = "DefaultMissingOriginator"  ) then {
+
+				OUTPUT_RESULT := CheckResult;	
+				OUTPUT_RESULT.Conclusion := "Missing originator: " + CheckResult.Conclusion;
+				CombineResultReady := true;	
+
+				if DEBUGCOMBINED then { print "DefaultMissingOriginator"; }
+			}
+
+			else if (CheckResult.RuleKey = "DefaultNoRegisterNameCheck")
+
+				then {				
+				OUTPUT_RESULT := CheckResult;
+				CombineResultReady := true;	
+
+				if DEBUGCOMBINED then { print "DefaultNoRegisterNameCheck"; }
+			}
+
+			else if (CheckResult.RuleKey = "NoSpecificChecksDefinedYet")
+
+				then {				
+				OUTPUT_RESULT := CheckResult;
+				CombineResultReady := true;	
+
+				if DEBUGCOMBINED then { print "NoSpecificChecksDefinedYet"; }
+			}
+
+			else {
+
+				if CheckResult.SensorCheck then {
+					if (OUTPUT_RESULT.level2 = "DefaultLevel2") and CheckResult.CheckMatched = "Match" and not CheckResult.GeneralCheck  then 
+					{		MatchedEventReceived := true;						
+					OUTPUT_RESULT := CheckResult;
+					/*EventInfo will be taken out of EventConclusions table using the more detailed en generic rulekeys.*/
+					OUTPUT_RESULT.EventInfo := "";	
+					OUTPUT_RESULT.Conclusion := "Possible issue detected: " + CheckResult.RuleKey;	
+
+					if DEBUGCOMBINED then { print "MatchDefault"; }
+
+
+					}
+
+					else if CheckResult.CheckMatched = "Match" and not CheckResult.GeneralCheck then {
+						MatchedEventReceived := true;	
+						if CheckResult.level2.toFloat() < OUTPUT_RESULT.level2.toFloat() 
+						then {
+							OUTPUT_RESULT.level1 := CheckResult.level1;
+							OUTPUT_RESULT.level2 := CheckResult.level2;
+						}
+
+						/*Combine all unique Rulekeys to single Rulekey Field and add all unique RuleKeys to Conclusion*/
+						if OUTPUT_RESULT.Conclusion.find(CheckResult.RuleKey) = -1	 and CheckResult.CheckMatched = "Match" 		 
+
+						then { OUTPUT_RESULT.Conclusion := OUTPUT_RESULT.Conclusion + " / "   +  CheckResult.RuleKey;
+						OUTPUT_RESULT.RuleKey := OUTPUT_RESULT.RuleKey + " / "   +  CheckResult.RuleKey;
+
+						/*Add all unique Check Types to type fields*/
+						if OUTPUT_RESULT.Type.find(CheckResult.Type) = -1  and CheckResult.CheckMatched = "Match" 		 
+
+						then {OUTPUT_RESULT.Type := OUTPUT_RESULT.Type + " / "   +  CheckResult.Type;}
+
+						}
+
+						if DEBUGCOMBINED then { print "Match"; }
+					}				
+
+				}		
+			}
+
+			on wait(9.9) {
+				/*When no result: write default event output*/
+				if (CombineResultReady = false and MatchedEventReceived = false)
+
+					then {  
+					if DEBUGCOMBINED then {print "No Matches --> Default conclusion"; }
+
+					SmartLinkOutputDefinition def;
+
+					def := getDetailedRuleDefinitionOutput(EventToAnalyse.SmartLinkEvent.EventName,EventToAnalyse.SmartLinkEvent.RegisterName,"Default",false);
+					if DEBUGCOMBINED then {print "Default" + def.toString(); }
+
+					/*If no default conclusion is available on the level of the originator, use default of the eventname*/
+					if def.RuleKey = "" then					
+					{ 
+						def :=  getDetailedRuleDefinitionOutput(EventToAnalyse.SmartLinkEvent.EventName,"","DefaultMissingOriginator",false);
+
+					}					
+
+					checkResult DefaultCheckResult := checkResult(EventToAnalyse.EventKey
+					                                              ,EventToAnalyse.SmartLinkEvent.CommunicationToken
+					                                              ,"Default"
+					                                              ,def.CheckMatched
+					                                              ,def.RuleSet
+					                                              ,def.BasicEventInfo 
+					                                              ,def.OutputLevel1
+					                                              ,def.OutputLevel2
+					                                              ,def.EventInfo
+					                                              ,true
+					                                              ,true
+					                                              ,false
+					                                              ,""
+					                                              ,"");
+
+					writeOutputToConclusionsTable(DefaultCheckResult);
+
+					OUTPUT_RESULT.Conclusion := "Default conclusion:  " +  DefaultCheckResult.Conclusion;
+					OUTPUT_RESULT.level1 := DefaultCheckResult.level1;
+					OUTPUT_RESULT.level2 := DefaultCheckResult.level2;
+				}
+				route SmartLinkOutputEvent(EventToAnalyse.SmartLinkEvent
+				                           ,OUTPUT_RESULT.level1
+				                           ,OUTPUT_RESULT.level2
+				                           ,true
+				                           ,OUTPUT_RESULT.Conclusion
+				                           ,currentTime
+				                           ,EventToAnalyse.EventKey);
+				/*Remove SensorValues from dictionary to save memory*/
+				route cleanSensorValueDictionary(EventToAnalyse.EventKey);
+
+				if DEBUG then {
+					route outgoingEventsCounterEvent(1);
+				}
+
+
+				if DEBUG or DEBUGCOMBINED then {	print "6. Route OutputResultTODashboard:" + OUTPUT_RESULT.toString() + "CombineResultReady" + CombineResultReady.toString() + "MatchedEventReceived" + MatchedEventReceived.toString() ;}
+				die;
+			}	
+		}
+	}
+
+
+	/** process request for both event values & aggregates out of the two different memory stores*/
+	action processMemStorRequests(string Eventkey,string CommunicationToken,string RegisterName, integer NumberOfDays, string TableName ) returns RequestedAggregate {
+
+		if DEBUG then {print "DataRequest received: " + TableName + " " + RegisterName;}
+
+		string AggregateKey := (CommunicationToken + "#" + RegisterName + "#" + NumberOfDays.toString() + "#EOL");
+		RequestedAggregate ReqAggr := RequestedAggregate(AggregateKey,"-99",-99,-99.0,-99,-99,-99,-99);
+
+		if NumberOfDays != 0 then { 
+
+			Table tblMachineAverages := AggregatesStore.open(TableName); 
+			Row r:= tblMachineAverages.get(AggregateKey);
+
+			if r.inTable() then {
+
+				ReqAggr := RequestedAggregate(
+				                              r.getString("AggregateKey"),
+				                              r.getString("registername"),
+				                              r.getInteger("numberofdays"),
+				                              r.getFloat("value"),
+				                              r.getInteger("latestsensorutc"),
+				                              r.getInteger("itemcount"),
+				                              r.getInteger("updatedon"),
+				                              r.getInteger("insertedon"));	
+			}
+
+			if DEBUG then {print "Result search memstore: " +  TableName + ": " + ReqAggr.toString();}
+
+		}
+
+		else {
+			dictionary< string, string >  temp := SensorValues.getOrDefault(Eventkey);
+			//if DEBUG then { print SensorValues.getOrDefault(Eventkey).toString();}
+
+			ReqAggr := RequestedAggregate(
+			                              AggregateKey,
+			                              RegisterName,
+			                              0,
+			                              temp.getOr(RegisterName, "-99").toFloat(),
+			                              0, /*Replace by date in eventkey*/
+			                              1,
+			                              0,
+			                              0);
+
+			if DEBUG then {print "Result search dictionary: " +  TableName + ": " + ReqAggr.toString();}			
+		}
+		return ReqAggr;		
+	}
+
+	/** Copy sensor values attached to an event to a dictionary for easy data access*/
+	action addSensorValToDictionary(string EventKey,string CommunicationToken, integer utctime, dictionary< string, string > RelatedSensors, dictionary< string, string > OriginatingSensors )  {
+		/*Add Originating sensors as well*/
+		string i;
+
+		for i in OriginatingSensors.keys() {			
+			RelatedSensors.add(i,OriginatingSensors.getOrDefault(i));			
+		}
+
+		SensorValues.add(EventKey,RelatedSensors);	
+
+		if DEBUG then {print "Event Values inserted in dictionary:" + SensorValues[EventKey].toString();}
+
+	}
+
+	/*action to check if pressure value is within the fysical range*/
+	action pressureOk(string RegisterName, float Value) returns boolean {
+
+		if (Value = 3276700.0 or Value = 3276000.0  or Value > 5000000.0) and Value != -9999.0 then
+		{
+			return false;
+		}
+		else
+		{
+			return true ;
+		}
+	}
+
+	/*action to check if temperature value is within the fysical range*/
+	action temperatureOk(string RegisterName, float value) returns boolean {
+
+		if (value > 573.0 or value < -274.0 ) and value != -9999.0 then
+		{
+			return false ;
+		}
+		else
+		{
+			return true;
+		}
+	}
+
+	/*Collect output rule based on rulekey out of memorystore*/
+	action getDetailedRuleDefinitionOutput(string EventName, string RegisterName,string RuleKey,boolean IsSensorCheck) returns SmartLinkOutputDefinition {
+
+		string definitionkey;
+
+		if IsSensorCheck then 
+
+		{
+			definitionkey :=  "" + "#" +  ""  + "#" + RuleKey + "#EOL";
+
+		} 
+
+		else if RuleKey = "Default" then  {
+
+			definitionkey :=  EventName + "#" +  RegisterName  + "#" + RuleKey + "#EOL";
+		}
+
+		else if RuleKey = "NoSpecificChecksDefinedYet" then  {
+
+			definitionkey :=  "EventNameIndependent" + "#" +  "NoRegisterName"  + "#" + RuleKey + "#EOL";
+		}
+
+		/* "DefaultNoRegisterNameCheck","DefaultMissingOriginator"*/
+		else  {
+
+			definitionkey :=  EventName + "#" +  "NoRegisterName"  + "#" + RuleKey + "#EOL";
+		}
+
+
+
+		Table tblRuleOutputDefinitions := AggregatesStore.open("tblDefaultRuleOutputDefinitions");
+
+		Row r;
+
+		SmartLinkOutputDefinition Result;
+		if tblRuleOutputDefinitions.hasKey(definitionkey) then {
+
+			r:=tblRuleOutputDefinitions.get(definitionkey); //Moet String zijn	
+			Result := SmartLinkOutputDefinition(            r.getString("ruleset"),
+			                                                r.getString("rulekey"),
+			                                                r.getString("checkmatched"),
+			                                                r.getString("eventname"),
+			                                                r.getString("checkregister"),
+			                                                r.getString("registername"),
+			                                                r.getString("registerdescription"),
+			                                                r.getString("outputlevel1"),
+			                                                r.getString("outputlevel2"),
+			                                                r.getString("basiceventinfo"),
+			                                                r.getString("eventinfo"),
+			                                                r.getString("ruleversion"));
+
+		}
+
+		else { Result := SmartLinkOutputDefinition(            "",
+		                                                       "",
+		                                                       "",
+		                                                       "",
+		                                                       "",
+		                                                       "",
+		                                                       "",
+		                                                       "",
+		                                                       "",
+		                                                       "",
+		                                                       "",
+		"");
+		}
+
+
+		if DEBUG then {  print "Default RuleKeyConversion Requested. RuleKey: " + definitionkey  + " RuleKey: " +   Result.RuleKey + " EventInfo:  " + Result.EventInfo;  }
+		return Result;		
+	}
+
+
+	/*Prepare dictionary to convert registernames to metadata*/
+	action prepareRegisterNameConvertor()
+	{
+
+		SmartLinkRegisterConverter register;
+
+		on all SmartLinkRegisterConverter():register {
+
+			sequence<string> row := [];
+			row.append(register.RegisterName);
+			row.append(register.RegisterDescription);
+			row.append(register.QuantityId.toString());
+			row.append(register.QuantityName);
+			row.append(register.SISymbol);
+			row.append(register.MetricScale.toString());
+			row.append(register.MetricOffset.toString());
+			row.append(register.MetricSymbol);
+			row.append(register.ImperialScale.toString());
+			row.append(register.ImperialOffset.toString());
+			row.append(register.ImperialSymbol);
+
+			// Lookup key
+			RegisterConversion.add(register.RegisterName, row );	
+		}
+	}
+
+
+	action enableCleanSensorValueDictionary()
+	{
+		cleanSensorValueDictionary c;
+
+		/*Listen for routed cleanSensorValueDictionary events. Communication from spawned monitor to original monitor works only with events*/
+		on all cleanSensorValueDictionary() : c {
+
+			if SensorValues.hasKey(c.EventKey) then {
+				SensorValues.remove(c.EventKey);
+				if DEBUG then { print "SensorValueCleared CurrentSize: " + SensorValues.size().toString();}
+			}
+			else {
+
+				if DEBUG then { print "SensorValueNotCleared. Eventkey not Available. CurrentSize: " + SensorValues.size().toString();}	
+			}		
+		}
+	}
+	
+	
+
+}
+
+
+/** Delete From Conclusion Table*/
+/*action deleteFromConclusionTable(SmartLinkSensorCheckKey EventToAnalyse,string RuleKey, string RuleKeyExtension, string AdditionalInfo, boolean GeneralCheck,boolean IsSensorCheck) {
+
+	SmartLinkOutputDefinition def;
+
+	/*Default = result coming from originator specific checks*/
+/*if RuleKey = "Default" then {		
+		def :=  getDetailedRuleDefinitionOutput(EventToAnalyse.SmartLinkEvent.EventName,EventToAnalyse.SmartLinkEvent.RegisterName,RuleKey,IsSensorCheck);
+	}		
+	/* "NoSpecificChecksDefinedYet","DefaultNoRegisterNameCheck","DefaultNoRegisterNameAvailable"*/
+/*else {			
+		def :=  getDetailedRuleDefinitionOutput(EventToAnalyse.SmartLinkEvent.EventName,"NoRegisterName",RuleKey,IsSensorCheck);	
+	}
+
+	Table tblEventConclusions := ConclusionsStore.open("Event_Conclusions");
+	string EventConclusionKey := def.RuleKey + "#" + RuleKeyExtension  + "#" + def.RuleSet + "#" + EventToAnalyse.EventKey; 
+	tblEventConclusions.remove(EventConclusionKey);
+
+	if DEBUG then {print "Row Removed from tbl conclusions: ID:" + EventConclusionKey.toString();}
+	integer id := tblEventConclusions.persist();
+}*/
+
+

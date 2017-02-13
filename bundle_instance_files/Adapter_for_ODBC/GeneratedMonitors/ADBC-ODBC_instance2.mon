@@ -1,0 +1,1082 @@
+
+/*
+ * Generated monitor for persisting events to a database for use in
+ * trending or other analysis of event values over time.
+ * 
+ */
+
+package com.apama.database.persistence;
+
+using com.apama.database.CreateStoreConfiguration;
+using com.apama.database.CreateStoreConfigurationInContext;
+using com.apama.database.StartStoreConfiguration;
+using com.apama.database.StopStoreConfiguration;
+using com.apama.database.DeleteStoreConfiguration;
+using com.apama.database.StoreConfigurationAck;
+using com.apama.database.StoreConfigurationReady;
+using com.apama.database.Connection;
+
+using com.apama.statusreport.SubscribeStatusToContext;
+using com.apama.statusreport.UnsubscribeStatusToContext;
+using com.apama.statusreport.SubscribeStatus;
+using com.apama.statusreport.UnsubscribeStatus;
+using com.apama.statusreport.Status;
+using com.apama.statusreport.StatusError;
+
+//
+// Generated event wrapper definitions for parallel support
+//
+event StoreEventData_ADBC_ODBC_instance2_com_atlascopco_ctsconnectivity_SmartLinkOutputEvent
+{
+	com.atlascopco.ctsconnectivity.SmartLinkOutputEvent evt;
+}
+
+
+/**
+ * This generated monitor will manage one or more store configurations.
+ * A store configuration controls the persistence of the event type(s)
+ * specified when the monitor was generated using the ADBC adapter event
+ * mapping tool.
+ *
+ * A store configuration is instantiated using the CreateStoreConfiguration
+ * event. Once instantiated the persistence of the configuration's event type
+ * can be started and stopped as desired.  If the configuration instance is
+ * no longer needed it can be removed using the DeleteStoreConfiguration.
+ * 
+ * If parallelExecution is specified when instantiating the configuration a 
+ * context will be dynamically created and used.  The context to use can be
+ * specified by using the CreateStoreConfigurationInContext event rather
+ * than CreateStoreConfiguration.
+ * 
+ * The monitor will handle an unplanned shutdown of the ADBC adapter
+ * by automatically reconnecting to the database when the adapter becomes
+ * available again.
+ *
+ * Events that can not be persisted while the adapter is down will be logged
+ * but no attempt is made to preserve those events for later persistence.
+ *
+ */
+monitor StoreEventData_ADBC_ODBC_instance2
+{
+	//
+	//	 Internal (private) events
+	//
+	event _ConfigurationCreated
+	{
+		integer messageId;
+		integer storeConfigId;
+		string name;
+		boolean success;
+	}
+	event _ConfigurationDeleted
+	{
+		integer messageId;
+		integer storeConfigId;
+		string name;
+		boolean success;
+	}
+	event _ConfigurationState
+	{
+		integer storeConfigId;
+		string name;
+		string tableName;
+		boolean parallelExecution;
+		context callerCtx;
+		context storeCtx;
+		boolean started;
+	}
+
+	// Connection event
+	Connection dbconn;
+
+	// The current context when the monitor is loaded.
+	// Initialized by the onload action
+	context preSpawnContext;
+
+	// The context of caller that requested the
+	// creation of this configuration.
+	context callerContext;
+
+	// Context for parallel execution
+	context storeContext;
+
+	// User specified context
+	boolean userSpecifiedContext := false;
+	
+	// Listers for create and delete configuration
+	listener createConfigListener;
+	listener deleteConfigListener;
+	listener createConfigInCtxListener;
+
+	// Listener for events to be stored
+	listener storeEventListener;
+
+	// Listener for wrapped events to be stored
+	// Only used if parallel execution is enabled
+	listener storeWrappedEventListener;
+
+	// Map of active listeners forwarding events to the store context
+	dictionary<integer,listener> ctxForwarders;
+
+	// Map of currently created configurations
+	dictionary<string,_ConfigurationState> configurations;
+
+	// Listener for adapter status
+	listener statusListener;
+	
+	// Listener for db reconnect
+	listener reconnectListener;
+
+	// Source of event data to be stored
+	//	scenario - Scenario create and update events (not supported by this monitor)
+	//	dataview - Dataview create and update events (not supported by this monitor)
+	//	event    - Specific events
+	string eventSourceType := "event";
+
+	// Names of events to be persisted
+	sequence<string> eventNames := ["com.atlascopco.ctsconnectivity.SmartLinkOutputEvent"];
+
+
+	// Name of event to be stored
+	string fullName := "";
+
+	// Identifier for the configuration instance
+	integer storeConfigId := -1;
+
+	// Parallel execution setting
+	boolean parallelExecution := false;
+
+	// Service ID for adapter to use.
+	string dbServiceId := "com.apama.adbc.ODBC_INSTANCE2";
+
+	// Database connection URL
+	string dbUrl := "";
+
+	// Database credentials
+	string user := "";
+	string password := "";
+
+	// Name of table to store events in
+	string tableName := "";
+
+	// Name of column to store event timestamp
+	string timeColumn := "";
+
+	// AutoCommit mode
+	//	"" - Use value set in adapter config file
+	//	true - Use datasource (ODBC/JDBC driver) autoCommit
+	//	false - Disable autoCommit
+	//	x.x - Timed auto commit interval (seconds)
+	string autoCommit := "";
+
+	// Throttle period (not supported by this monitor)
+	// Only store updates on this frequency (seconds)
+	float throttlePeriod := 0.0;
+
+	// Indicator the configuration is running
+	boolean configurationStarted := false;
+
+	// Indicator the database is connected
+	boolean connected := false;
+
+	// Indicator the database requires reconnect
+	boolean reconnect := false;
+
+	// Indicator a database reconnect has started
+	boolean reconnectStarted := false;
+
+	// Invalid connection id that required reconnect
+	integer invalidId := 0;
+
+	// Flag to indicate spawned monitor should be stopped.
+	// Set in delete configuration and used in the close database handler.
+	boolean killMonitor := false;
+
+	// Message id for configuration request being processed
+	integer currentMessageId := 0;
+
+	// Message id for start configuration request
+	integer startConfigMessageId := 0;
+
+	// Indicator for configuration autoStart
+	boolean autoStart := false;
+
+	/**
+	 * Onload action.
+	 * Creates listeners for requests to create store configurations.
+	 * The requested configuration will be created in a spawned monitor
+	 * if it doesn't already exist.
+	 */
+	action onload
+	{
+		log "Loaded ADBC store event service" at INFO;
+		log "   Supported events: " + eventNames.toString() at INFO;
+
+		preSpawnContext := context.current();
+
+		// Listen for create configuration events
+		CreateStoreConfiguration config;
+		createConfigListener := on all CreateStoreConfiguration():config {
+
+			// Set the caller context
+			callerContext := preSpawnContext;
+
+			// Verify the configuration requested isn't already running or
+			// is for a different monitor.
+			if not validateConfiguration(config, config.parallelExecution) then {
+				return;
+			}
+
+			// Create a store context if parallel execution if specified
+			if config.parallelExecution then {
+				storeContext := context("StoreEventData_ADBC_ODBC_instance2" + config.eventSourceType.toUpper() + "-" + config.name);
+			}
+			else {
+				storeContext := preSpawnContext;
+			}
+
+			// Add configuration to created list
+			configurations.add(config.name,_ConfigurationState(0,config.name,config.tableName,config.parallelExecution,callerContext,storeContext,false));
+
+			// Update configuration in list with configId once it is created
+			startInternalConfigListeners(config.messageId, config.parallelExecution, storeContext, userSpecifiedContext);
+
+			// Enable parallel execution if specified
+			if config.parallelExecution then {
+				spawn createConfiguration(config) to storeContext;
+			}
+			else {
+				spawn createConfiguration(config);
+			}
+		}
+
+		// Listen for create configuration events that specify the contexts to use
+		CreateStoreConfigurationInContext configInContext;
+		createConfigInCtxListener := on all CreateStoreConfigurationInContext():configInContext {
+
+			// Create a standard config event
+			CreateStoreConfiguration cfg := new CreateStoreConfiguration;
+			cfg.messageId := configInContext.messageId;
+			cfg.serviceName := configInContext.serviceName;
+			cfg.eventSourceType := configInContext.eventSourceType;
+			cfg.name := configInContext.name;
+			cfg.DbUrl := configInContext.DbUrl;
+			cfg.userName := configInContext.userName;
+			cfg.password := configInContext.password;
+			cfg.tableName := configInContext.tableName;
+			cfg.timeColumn := configInContext.timeColumn;
+			cfg.autoCommit := configInContext.autoCommit;
+			cfg.throttlePeriod := configInContext.throttlePeriod;
+			cfg.parallelExecution := true;
+			cfg.extraParams := configInContext.extraParams;
+
+			// Set the specified caller context
+			callerContext := configInContext.thisContext;
+
+			// Verify the configuration requested isn't already running or
+			// is for a different monitor.
+			if not validateConfiguration(cfg, cfg.parallelExecution) then {
+				callerContext := preSpawnContext;
+				return;
+			}
+
+			// Set the specified store context to use
+			storeContext := configInContext.storeContext;
+			userSpecifiedContext := true;
+
+			// Add configuration to list
+			configurations.add(cfg.name,_ConfigurationState(0,cfg.name,cfg.tableName,cfg.parallelExecution,callerContext,storeContext,false));
+
+			// Update configuration list with configId once it is created
+			startInternalConfigListeners(cfg.messageId, cfg.parallelExecution, storeContext, userSpecifiedContext);
+
+			// Enable parallel execution
+			spawn createConfiguration(cfg) to storeContext;
+		}
+	}
+
+	/**
+	 * Verify the requested configuration is supported by this monitor and does not already exist.
+	 *
+	 * @param  storeConfig - CreateStoreConfiguration event
+	 * @param  parallelMode - True if configuration should run in a separate context
+	 */
+	action validateConfiguration(CreateStoreConfiguration storeConfig, boolean parallelMode) returns boolean
+	{
+		boolean isValid := true;
+		string error := "";
+
+		// Verify the create config request is for this monitor
+		string type := storeConfig.eventSourceType;
+		if type.ltrim().rtrim().length() = 0 then {
+			type := "event"; // Default to event if omitted
+		}
+		if dbServiceId != storeConfig.serviceName 
+				or type != eventSourceType or not eventNames.indexOf(storeConfig.name) >= 0 then {
+			// Configuration request not for this monitor, ignore it
+			log "Ignoring CreateStoreConfiguration for sourceType="	+ type
+					+ " name=" + storeConfig.name + " serviceName=" + storeConfig.serviceName at DEBUG;
+			isValid := false;
+		}
+
+		// Verify the configuration isn't already running
+		if isValid then {
+			isValid := not isRunning(storeConfig.name);
+	
+			if not isValid then {
+				// Send acknowledgement with error message
+				error := "Configuration for " + storeConfig.name + " already exists.";
+				log error at INFO;
+				StoreConfigurationAck ack := StoreConfigurationAck(storeConfig.messageId, 0, storeContext, storeConfig.name, error, new dictionary<string,string>);
+				if parallelMode then {
+					enqueue ack to callerContext;
+				}
+				else {
+					route ack;
+				}
+			}
+		}
+
+		return isValid;
+	}
+
+	/**
+	 * Start the listeners to handle internal communication between main and spawned monitor.
+	 *
+	 * @param  messageId - Message Id of CreateStoreConfiguration event
+	 * @param  parallelMode - True if configuration should run in a separate context
+	 * @param  storeCtx - The context for persistence (if parallelMode is enabled)
+	 */
+	action startInternalConfigListeners(integer messageId, boolean parallelMode, context storeCtx, boolean useWrappedEvents)
+	{
+		// Update configuration list with configId once it is created
+		_ConfigurationCreated cfgCreated;
+		on _ConfigurationCreated(messageId=messageId):cfgCreated {
+			if configurations.hasKey(cfgCreated.name) then {
+				if cfgCreated.success then {
+					configurations[cfgCreated.name].storeConfigId := cfgCreated.storeConfigId;
+					// Setup context forwarders for events
+					if parallelMode then {
+						if useWrappedEvents then {
+							startWrappedEventForwarding(cfgCreated.name, cfgCreated.storeConfigId, storeCtx);
+						}
+						else {
+							startEventForwarding(cfgCreated.name, cfgCreated.storeConfigId, storeCtx);					
+						}
+					}
+					log "ADBC store event service for '" + cfgCreated.name + "' created." at INFO;
+				}
+			}
+			else {
+				// Already deleted?
+				log "Internal error: Configuration '" + cfgCreated.name + "' not properly created ." at INFO;
+			}
+		}
+
+		// Listen for internal configuration deleted events
+		_ConfigurationDeleted cfgDeleted;
+		deleteConfigListener := on all _ConfigurationDeleted():cfgDeleted {
+
+			// Verify the configuration requested is present
+			_ConfigurationState cfgState;
+			boolean found := false;
+			boolean parallel := false;
+			string name := "";
+			for cfgState in configurations.values(){
+				if cfgState.storeConfigId = cfgDeleted.storeConfigId then {
+					found := true;
+					name := cfgState.name;
+					parallel := cfgState.parallelExecution;
+				}
+			}
+
+			if found then {
+				// Stop context forwarders for events
+				if parallel then {
+					stopEventForwarding(cfgDeleted.storeConfigId);
+				}
+
+				configurations.remove(cfgDeleted.name);
+				log "Configuration '" + cfgDeleted.name + "' deleted." at DEBUG;
+			}
+		}
+	}
+
+	/**
+	 * Create the store configuration for the specified event.
+	 * This action is spawned and then handles all operations for this configuration.
+	 *
+	 * @param  storeConfig - CreateStoreConfiguration event
+	 */
+	action createConfiguration(CreateStoreConfiguration storeConfig)
+	{
+		// Generate a config instance Id
+		storeConfigId := integer.getUnique();
+
+		// Name of scenario to be stored
+		fullName := storeConfig.name;
+
+		// Connection URL
+		dbUrl := storeConfig.DbUrl;
+
+		// Database credentials
+		user := storeConfig.userName;
+		password := storeConfig.password;
+
+		// Name of table to store events in
+		tableName := storeConfig.tableName;
+
+		// Name of column to store event timestamp
+		timeColumn := storeConfig.timeColumn;
+
+		// Auto commit mode
+		autoCommit := storeConfig.autoCommit;
+
+		// Scenario update store throttle period
+		throttlePeriod := storeConfig.throttlePeriod;
+
+		// Parallel execution
+		parallelExecution := storeConfig.parallelExecution;
+
+		// Context in use
+		storeContext := context.current();
+
+		// Should configuration be immediately started
+		autoStart := storeConfig.autoStart;
+		
+		// Create listeners for start, stop, and delete configuration
+		dbconn := new Connection;
+		StartStoreConfiguration startConfig;
+		listener startListener := on all StartStoreConfiguration(storeConfigId=storeConfigId):startConfig {
+			// Open the database connection and start persisting events
+			startPersistence(startConfig.messageId, startConfig.timeOut);
+		}
+		StopStoreConfiguration stopConfig;
+		listener stopListener := on all StopStoreConfiguration(storeConfigId=storeConfigId):stopConfig {
+			// Stop persisting events and close database connection
+			stopPersistence(stopConfig.messageId, false);
+		}
+		DeleteStoreConfiguration deleteConfig;
+		listener deleteListener := on DeleteStoreConfiguration(storeConfigId=storeConfigId):deleteConfig {
+			startListener.quit();
+			stopListener.quit();
+			// Send internal configuration deleted
+			_ConfigurationDeleted internalDeleted := _ConfigurationDeleted(deleteConfig.messageId, storeConfigId, fullName, true);
+			if not preSpawnContext.getId() = context.current().getId() then {
+				enqueue internalDeleted to preSpawnContext;
+			}
+			else {
+				route internalDeleted;
+			}
+			// Stop persisting events and force close database connection if needed.
+			// When finished the monitor instance will be stopped.
+			killMonitor := true;
+			stopPersistence(deleteConfig.messageId, true);
+		}
+
+		// Send internal configuration created acknowledgement
+		_ConfigurationCreated internalCreated := _ConfigurationCreated(storeConfig.messageId, storeConfigId, storeConfig.name, true);
+		if not preSpawnContext.getId() = context.current().getId() then {
+			enqueue internalCreated to preSpawnContext;
+		}
+		else {
+			route internalCreated;
+		}
+
+		// Send configuration created acknowledgement
+		StoreConfigurationAck ack := StoreConfigurationAck(storeConfig.messageId, storeConfigId, storeContext, storeConfig.name, "", new dictionary<string,string>);
+		if parallelExecution then {
+			enqueue ack to callerContext;
+		}
+		else {
+			route ack;
+		}
+		
+		// Start configuration if autoStart is enabled
+		if autoStart then {
+			// Open the database connection and start persisting events
+			startPersistence(storeConfig.messageId, 30.0);			
+		}
+	}
+
+	/**
+	 * Starts the store configuration.  The database connection is created and
+	 * listeners started to handle persisting the configuration's specified event.
+	 * This action is called in the spawned monitor.
+	 *
+	 * @param  messageId - Message Id of StartStoreConfiguration event
+	 * @param  timeout - Time in seconds to wait for the database connection to be created
+	 */
+	action startPersistence(integer messageId, float timeOut)
+	{
+		// Update id being processed
+		currentMessageId := messageId;
+
+		// Save off the start config message id
+		startConfigMessageId := messageId;
+
+		// Set onload context
+		if parallelExecution then {
+			dbconn.initPreSpawnContext(preSpawnContext);
+		}
+
+		// Subscribe for adapter status, open database connection, then listen for events
+		startListeners(messageId, timeOut);
+	
+		configurationStarted := true;
+	}
+
+	/**
+	 * Stops the store configuration.  The database connection is closed and
+	 * listeners that handle persisting the configuration's specified event are
+	 * stopped. The force setting is used when deleting the configuration to
+	 * ensure the database connection is closed.
+	 * This action is called in the spawned monitor.
+	 *
+	 * @param  messageId - Message Id of Stop or Delete Configuration event
+	 * @param  force - Will forcibly close the database connection
+	 */
+	action stopPersistence(integer messageId, boolean force)
+	{
+		// Update id being processed
+		currentMessageId := messageId;
+
+		// Shutdown status/event listeners and close database connection
+		stopListeners(force);
+
+		configurationStarted := false;
+	}
+
+	/**
+	 * Start the store configuration listeners.  Adapter status listeners are started
+	 * to ensure the adapter is running before attempting to connect to the db and also
+	 * to monitor for the shutdown of the adapter. If the db connection is successful
+	 * the listeners for persisting are started.
+	 * This action is called in the spawned monitor.
+	 *
+	 * @param  messageId - Message Id of Stop or Delete Configuration event
+	 * @param  timeout - Time in seconds to wait for the database connection to be created
+	 */
+	action startListeners(integer messageId, float timeOut)
+	{
+		// Once adapter is up and connection is made, listen for the adapter going down
+		Status status;
+		StatusError statusError;
+		statusListener := on all (Status(serviceID=dbServiceId, available=true)
+							-> StatusError(serviceID=dbServiceId): statusError) {
+			if connected then {
+				log "Configuration '" + fullName + "': Database adapter is down: " + statusError.description at WARN;
+			
+				// Set configuration state to disconnected
+				connected := false;
+				
+				// Enable reconnect
+				reconnect := true;
+
+				// Reset connection to allow reconnect
+				dbconn.reset();
+				
+				// The adapter is down, listen for the adapter up and then reconnect
+				reconnectListener := on all wait(5.0) and Status(serviceID=dbServiceId) : status {
+					if not connected and reconnect and not reconnectStarted then {
+						// Open database connection and start persisting events
+						reconnectStarted := true;
+						log "Configuration '" + fullName + "': Reconnecting, database adapter is now up" at INFO;
+						dbconn.openDatabase(dbServiceId, dbUrl, user, password, autoCommit, openDatabaseHandler);
+					}
+				}		
+			}
+		}		
+
+		// If timeout occurs before the adapter is up, send a timed out error
+		listener timeoutlistener := on wait (timeOut) and (not Status(serviceID=dbServiceId) or StatusError(serviceID=dbServiceId)) {
+			string errorMsg := "Database adapter not up after " + timeOut.formatFixed(1) + " second(s)";
+			log "Configuration '" + fullName + "': " + errorMsg at ERROR;
+			statusListener.quit();
+			// Don't send acknowledgement if configuration is auto-started
+			if not autoStart then {
+				StoreConfigurationAck ack := StoreConfigurationAck(currentMessageId, storeConfigId, storeContext, fullName, errorMsg, new dictionary<string,string>);
+				if parallelExecution then {
+					enqueue ack to callerContext;
+				}
+				else {
+					route ack;
+				}
+			}
+		}
+
+		// Wait for adapter to be available then connect to database
+		on Status(serviceID=dbServiceId) : status and not wait (timeOut) {
+			timeoutlistener.quit();
+			// Open database connection and start persisting events
+			log "Configuration '" + fullName + "': Connecting to database " + dbUrl + " ..." at DEBUG;
+			dbconn.openDatabase(dbServiceId, dbUrl, user, password, autoCommit, openDatabaseHandler);
+		}
+
+		// Subscribe for status from any ADBC adapter adapter
+		// This allows the subscription to be made before the adapter is started
+		SubscribeStatus subscribe := new SubscribeStatus;
+		subscribe.serviceID := "ADBC"; // Wildcard subscription
+		log "Configuration '" + fullName + "': Subscribing to status with timeout "
+					+ timeOut.toString() + " : " + subscribe.toString() at DEBUG;
+		if parallelExecution then {
+			enqueue SubscribeStatusToContext(context.current(), subscribe) to preSpawnContext;
+			// Need to also subscribe to the specific adapter of interest to get the status forwarded
+			subscribe.serviceID := dbServiceId;
+			enqueue SubscribeStatusToContext(context.current(), subscribe) to preSpawnContext;
+		}
+		else {
+			route subscribe;
+		}
+
+	}
+
+	/**
+	 * Stops the store configuration listeners.  The adapter status listener is stopped
+	 * then the database connection is closed and listeners that handle persisting are
+	 * stopped. The force setting is used when deleting the configuration to
+	 * ensure the database connection is closed.
+	 * This action is called in the spawned monitor.
+	 *
+	 * @param  messageId - Message Id of Stop or Delete Configuration event
+	 * @param  force - Will forcibly close the database connection
+	 */
+	action stopListeners(boolean force)
+	{
+		// Stop adapter status listener
+		statusListener.quit();
+		
+		// Shutdown event listeners and close database connection
+		stopPersistenceListeners(force);
+		
+		// Remove status subscriptions
+		if configurationStarted then {
+			UnsubscribeStatus unsubscribe := new UnsubscribeStatus;
+			unsubscribe.serviceID := "ADBC";
+			if parallelExecution then {
+				enqueue UnsubscribeStatusToContext(context.current(), unsubscribe) to preSpawnContext;
+				// Need to also unsubscribe from the specific adapter of interest
+				unsubscribe.serviceID := dbServiceId;
+				enqueue UnsubscribeStatusToContext(context.current(), unsubscribe) to preSpawnContext;
+			}
+			else {
+				route unsubscribe;
+			}			
+		}
+
+	}
+
+	/**
+	 * Callback handler for opening the database connection.  If successful
+	 * the listeners for persisting events will be started. 
+	 *
+	 * @param  conn - The database connection (Connection event)
+	 * @param  error - The error, if any, from the open database call
+	 */
+	action openDatabaseHandler(Connection conn, string error)
+	{
+		string errorMsg := error;
+		boolean failed := error.length() != 0;
+		boolean isReconnect := reconnect;
+		if failed then {
+			string errorMsg := "Error connecting to database " + conn.getDatabaseURL() + ": " + error;
+			log "Configuration '" + fullName + "': " + errorMsg at ERROR;
+		}
+		else {
+			log "Configuration '" + fullName + "': Database " + conn.getDatabaseURL() + " connected." at DEBUG;
+		}
+
+		// Start or resume persisting if open succeeded
+		if not failed then {
+
+			// Set the callback for store errors
+			conn.setStoreErrorCallback(handleStoreError);
+
+			if isReconnect then {
+				reconnect := false;
+				invalidId := 0;
+				reconnectListener.quit();
+			}
+			else {
+				startPersistenceListeners();
+			}
+			connected := true;
+		}
+		reconnectStarted := false;
+
+		if not isReconnect and not autoStart then {
+			StoreConfigurationAck ack := StoreConfigurationAck(currentMessageId, storeConfigId, storeContext, fullName, errorMsg, new dictionary<string,string>);
+			if parallelExecution then {
+				enqueue ack to callerContext;
+			}
+			else {
+				route ack;
+			}
+		}
+		
+		// Send configuration ready notification
+		StoreConfigurationReady ready := StoreConfigurationReady(startConfigMessageId, storeConfigId, fullName, new dictionary<string,string>);
+		if parallelExecution then {
+			enqueue ready to callerContext;
+		}
+		else {
+			route ready;
+		}
+	}
+
+	/**
+	 * Callback handler for closing the database connection.
+	 * if the variable killMonitor is true the monitor will
+	 * be terminated.
+	 *
+	 * @param  conn - The database connection (Connection event)
+	 * @param  error - The error, if any, from the open database call
+	 */
+	action closeDatabaseHandler(Connection conn, string error)
+	{
+		string errorMsg := error;
+		boolean failed := error.length() != 0;
+		if failed then {
+			string errorMsg := "Error disconnecting database " + conn.getDatabaseURL() + ": " + error;
+			log "Configuration '" + fullName + "': " + errorMsg at ERROR;
+		}
+		else {
+			log "Configuration '" + fullName + "': Database " + conn.getDatabaseURL() + " disconnected." at DEBUG;
+			connected := false;
+		}
+		StoreConfigurationAck ack := StoreConfigurationAck(currentMessageId, storeConfigId, storeContext, fullName, errorMsg, new dictionary<string,string>);
+		if parallelExecution then {
+			enqueue ack to callerContext;
+		}
+		else {
+			route ack;
+		}
+		// Terminate monitor instance if requested
+		if killMonitor then {
+			die;
+		}
+	}
+
+	/**
+	 * Callback handler for closing the database connection
+	 * to allow a reconnect. Used when an adapter down has
+	 * been detected.
+	 *
+	 * @param  conn - The database connection (Connection event)
+	 * @param  error - The error, if any, from the open database call
+	 */
+	action reconnectDatabaseHandler(Connection conn, string error)
+	{
+		string errorMsg := error; // Ignore, invalid db connection error is expected
+		log "Configuration '" + fullName + "': Invalid connection to database " + conn.getDatabaseURL() + " disconnected." at DEBUG;
+
+		// Reset connection to allow reconnect
+		conn.reset();
+
+		log "Configuration '" + fullName + "': Reconnecting invalid db connection" at INFO;
+		conn.openDatabase(dbServiceId, dbUrl, user, password, autoCommit, openDatabaseHandler);
+	}
+
+	/**
+	 * Start the listeners for the configuration specific event.
+	 * This action is called in the spawned monitor.
+	 */
+	action startPersistenceListeners()
+	{
+		if parallelExecution and userSpecifiedContext then {
+			// Multiple adapters could be using the same context
+			// so events need to be wrapper with monitor (adapter)
+			// specific named event to prevent duplicates if the same
+			// event is being persisted by multiple adapters.
+			startWrappedEventListeners();
+		}
+		else {
+			startEventListeners();		
+		}
+		log "Configuration '" + fullName + "' started." at INFO;
+	}
+
+	/**
+	 * The generated action that starts the listener for the
+	 * configuration specific event.
+	 * This action is called in the spawned monitor.
+	 */
+	action startEventListeners()
+	{
+		// Generated code
+		if fullName = "com.atlascopco.ctsconnectivity.SmartLinkOutputEvent" then {
+
+			// Create listener for event to be stored
+			com.atlascopco.ctsconnectivity.SmartLinkOutputEvent evt;
+			storeEventListener := on all com.atlascopco.ctsconnectivity.SmartLinkOutputEvent():evt {
+				integer storeId := 0;
+
+				if connected then {
+					dictionary<string,string> extraParams := new dictionary<string,string>;
+
+					log "Storing SmartLinkOutputEvent: " + evt.toString() at DEBUG;
+					storeId := dbconn.storeEvent(evt.getTime(), evt.toString(), tableName, "", timeColumn, extraParams);
+				}
+
+				// storeId of 0 indicates database connection not open
+				if storeId = 0 then {
+					log "Connection not open: Unable to store SmartLinkOutputEvent: " + evt.toString() at WARN;
+				}
+			}
+		}
+
+ 
+	}
+
+	/**
+	 * The generated action that starts the listener for the
+	 * wrapped configuration specific event.  Used on when
+	 * parallel execution is enabled.
+	 * This action is called in the spawned monitor.
+	 */
+	action startWrappedEventListeners()
+	{
+		// Generated code
+		if fullName = "com.atlascopco.ctsconnectivity.SmartLinkOutputEvent" then {
+
+			// Create listener for wrapped event to be stored
+			StoreEventData_ADBC_ODBC_instance2_com_atlascopco_ctsconnectivity_SmartLinkOutputEvent wrapper;
+			storeWrappedEventListener := on all StoreEventData_ADBC_ODBC_instance2_com_atlascopco_ctsconnectivity_SmartLinkOutputEvent():wrapper {
+				com.atlascopco.ctsconnectivity.SmartLinkOutputEvent evt := wrapper.evt;
+				integer storeId := 0;
+
+				if connected then {
+					dictionary<string,string> extraParams := new dictionary<string,string>;
+
+					log "Storing SmartLinkOutputEvent: " + evt.toString() at DEBUG;
+					storeId := dbconn.storeEvent(evt.getTime(), evt.toString(), tableName, "", timeColumn, extraParams);
+				}
+
+				// storeId of 0 indicates database connection not open
+				if storeId = 0 then {
+					log "Connection not open: Unable to store SmartLinkOutputEvent: " + evt.toString() at WARN;
+				}
+			}
+		}
+
+ 
+	}
+
+	/**
+	 * Stops the listeners for the configuration specific event.
+	 * If the database connection is open the database connection is closed.
+	 * The force setting is used when deleting the configuration to
+	 * ensure the database connection is closed.
+	 * This action is called in the spawned monitor.
+	 *
+	 * @param  force - Will forcibly close the database connection
+	 */
+	action stopPersistenceListeners(boolean force)
+	{
+		// Stop listeners
+		if parallelExecution and userSpecifiedContext then {
+			storeWrappedEventListener.quit();
+		}
+		else {
+			storeEventListener.quit();
+		}
+
+		// Close database if open
+		if connected and dbconn.getDbId() > 0 then {
+			log "Configuration '" + fullName + "' disconnecting from database " + dbconn.getDatabaseURL() + " ..." at DEBUG;
+
+			// The close db handler will send the acknowledgement event
+			// and unload monitor if requested
+			if force then {
+				dbconn.forceCloseDatabase(closeDatabaseHandler);
+			}
+			else {
+				dbconn.closeDatabase(closeDatabaseHandler);
+			}
+		}
+		else {
+			StoreConfigurationAck ack := StoreConfigurationAck(currentMessageId, storeConfigId, storeContext, fullName, "", new dictionary<string,string>);
+			if parallelExecution then {
+				enqueue ack to callerContext;
+			}
+			else {
+				route ack;
+			}
+			// Stop monitor instance if requested
+			if killMonitor then {
+				die;
+			}
+		}
+		log "Configuration '" + fullName + "' stopped." at INFO;
+	}
+
+	/**
+	 * Callback error handler for store errors.
+	 * Used to handle errors caused by invalid connection id.
+	 * An invalid connection is an error that can be 
+	 * recovered from by performing a reconnect.  Any other error
+	 * is just reported.
+	 *
+     * @param  conn - The database connection (Connection event)
+	 * @param  firstStoreId - The storeId of the earliest failure
+	 * @param  lastStoreId - The storeId of the last failure
+	 * @param  errorMessage - A description of the error
+	 */
+	action handleStoreError(Connection conn, integer firstStoreId, integer lastStoreId, string errorMessage)
+	{
+		if errorMessage.length() > 0 then {
+			log "Configuration '" + fullName + "': StoreError - [" + errorMessage + "]" at WARN;
+		}
+		// Perform a reconnect if error is due to an invalid connection id.
+		// This can occur if the adapter goes down and comes back up before
+		// the IAF status system can detect it went down (less than ~20 seconds).
+		if errorMessage.length() > 0 and errorMessage.find("Invalid database Id") = 0 then {
+		
+			// Ignore if a reconnect has already been done
+			if errorMessage.find("Invalid database Id: " + invalidId.toString()) = 0 then {
+				log "Configuration '" + fullName + "': Already reconnected this invalid db connection" at INFO;				
+			}
+			else {
+			
+				if connected and not reconnect and not reconnectStarted then {
+					// Set configuration state to disconnected
+					connected := false;
+					
+					// Enable reconnect
+					reconnect := true;
+					
+					// Record invalid Id
+					invalidId := conn._dbId;
+		
+					// Close then re-open the database connection and start persisting events
+					reconnectStarted := true;
+					log "Configuration '" + fullName + "': Disconnecting invalid db connection" at INFO;
+					conn.closeDatabase(reconnectDatabaseHandler);
+				}
+			}
+		}
+	}
+
+	/**
+	 * The generated action to start the listeners to forward the
+	 * configuration specific event to the context the configuration is using.
+	 * The name and configuration id are needed since the monitor supports
+	 * multiple configurations (event types). Only used if parallelExecution is enabled.
+	 * This action is called in the spawned monitor.
+	 *
+	 * @param  name - The name of the event to forward
+	 * @param  configId - Id of configuration
+	 * @param  storeCtx - The context performing persistence
+	 */
+	action startEventForwarding(string name, integer configId, context storeCtx)
+	{
+		// Generated code
+		if name = "com.atlascopco.ctsconnectivity.SmartLinkOutputEvent" then {
+			com.atlascopco.ctsconnectivity.SmartLinkOutputEvent evt;
+			listener cf := on all com.atlascopco.ctsconnectivity.SmartLinkOutputEvent():evt {
+				enqueue evt to storeCtx;
+			}
+			ctxForwarders.add(configId, cf);
+		}
+
+
+	}
+
+	/**
+	 * The generated action to start the listeners to forward the
+	 * configuration specific event to the context the configuration is using.
+	 * The event is wrapped to allow for the same event to be persisted to
+	 * multiple adapter instances in the same project.
+	 * The name and configuration id are needed since the monitor supports
+	 * multiple configurations (event types). Only used if parallelExecution is enabled.
+	 * This action is called in the spawned monitor.
+	 *
+	 * @param  name - The name of the event to forward
+	 * @param  configId - Id of configuration
+	 * @param  storeCtx - The context performing persistence
+	 */
+	action startWrappedEventForwarding(string name, integer configId, context storeCtx)
+	{
+		// Generated code
+		if name = "com.atlascopco.ctsconnectivity.SmartLinkOutputEvent" then {
+			com.atlascopco.ctsconnectivity.SmartLinkOutputEvent evt;
+			listener cf := on all com.atlascopco.ctsconnectivity.SmartLinkOutputEvent():evt {
+				enqueue StoreEventData_ADBC_ODBC_instance2_com_atlascopco_ctsconnectivity_SmartLinkOutputEvent(evt) to storeCtx;
+			}
+			ctxForwarders.add(configId, cf);
+		}
+
+
+	}
+
+	/**
+	 * Stops the listeners that forward the configuration
+	 * specific event to the context the configuration is using.
+	 *
+	 * @param  configId - Id of configuration
+	 */
+	action stopEventForwarding(integer configId)
+	{
+		if ctxForwarders.hasKey(configId) then {
+			ctxForwarders[configId].quit();
+		}
+	}
+
+	/**
+	 * Returns the running status of the configuration,
+	 *
+	 * @param  name - Configuration name (event name)
+	 * @return True if configuration is running else false.
+	 */
+	action isRunning(string name) returns boolean {
+		return configurations.hasKey(name);
+	}
+
+	/**
+	 * Called when the monitor instance stops running.
+	 */
+	action ondie() {
+		boolean active := false;
+		// Spawned monitors will have a name
+		string name := "";
+		if fullName.length() > 0 then {
+			name := " for '" + fullName + "'";
+		}
+		if (configurations.size() != 0) then {
+			_ConfigurationState state;
+			for state in configurations.values() {
+				if state.started then {
+					if fullName.length() > 0 then {
+						if fullName = state.name then {
+							active := true;
+							break;
+						}
+					}
+					else {
+						active := true;
+						break;
+					}
+				}
+			}
+		}
+		if active then {
+			if name.length() > 0 then {
+				log "ADBC store event service" + name + " is terminating but the store configuration is active" at ERROR;
+			}
+			else {
+				log "ADBC store event service is terminating but store configurations are still active" at ERROR;
+			}
+		}
+		else {
+			log "ADBC store event service" + name + " is terminating" at INFO;
+		}
+	}
+
+	/**
+	 * Called when monitor is unloaded
+	 */
+	action onunload {
+		log "Unloaded ADBC store event service" at INFO;
+	}
+
+}

@@ -1,0 +1,66 @@
+package com.apamax.email;
+
+
+/**
+ * The event to emit to the adapter.  Can be directly emitted
+ * or routed to the SendMailForwarder.
+ */
+event SendMail
+{
+	string emailTo;
+	string emailFrom;
+	string subject;
+	string body;
+	sequence<string> attachments;
+	action createSendMailWithDefaultMailId( string subject,string body ) returns com.apamax.email.SendMail {
+		com.apamax.email.SendMail sendMail := new  com.apamax.email.SendMail;
+		sendMail.subject:=subject;
+		sendMail.body:=body;
+		return sendMail;
+	}
+	action createSendMailWithEmailTo( string emailTo,string subject,string body ) returns com.apamax.email.SendMail {
+		com.apamax.email.SendMail sendMail := new  com.apamax.email.SendMail;
+		sendMail.subject:=subject;
+		sendMail.body:=body;
+		sendMail.emailTo:=emailTo;
+		return sendMail;
+	}
+}
+
+
+/**
+ * Send this event from any service monitor used with this adapter
+ * if the service monitor is unloaded (send from unload).  This 
+ * will allow the monitor to notify the application and discontinue
+ * the sending of status information.  This is purely optional.
+ */
+event ServiceMonitorUnloaded
+{
+	string monitorName;
+	string message;
+}
+
+
+/**
+ * Send this event from any service monitor used with this adapter
+ * when the monitor comes online.  The status manager
+ * only caches monitors that have died and waits for
+ * them to come back online before resuming status information passing,
+ * so there is no requirement for this monitor to be injected before
+ * other services for this adapter.  This is purely optional.
+ */
+event ServiceMonitorOnline
+{
+	string monitorName;
+}
+/**
+* Send this event for populating emailid Configuration
+*/
+event MailConfiguration
+{
+	string connectionLostMailId;
+	string connectionRestoredMailId;	
+	float  timeDelay;
+	string logDir;
+}
+

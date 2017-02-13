@@ -1,0 +1,143 @@
+//*****************************************************************************
+//Title:         OutputRules
+//Description:   OutputRules description
+//Dependencies:  None
+//Author:        air15581
+
+//*****************************************************************************
+package com.atlascopco.ctsconnectivity;
+using com.apama.memorystore.Store;
+using com.apama.memorystore.Table;
+using com.apama.memorystore.Storage;
+using com.apama.memorystore.Finished;
+using com.apama.memorystore.Row;
+
+
+/*Test Suppression:
+
+com.atlascopco.ctsconnectivity.SmartLinkSensorCheck(com.atlascopco.ctsconnectivity.SmartLinkRuleEvent("GeneralShutdownWarning","1008","486,15",{"1008":"486.15"},{"1000":"301.15","1001":"317.75","1004":"318.95","1005":"462.25","1102":"331.05","1203":"316.45","1204":"482.75","1207":"326.65","1700":"167.55160816","2100":"1","2101":"0","2124":"0","2304":"0","2305":"0","2306":"1","2307":"1","2310":"1","2311":"0","2312":"0","2313":"1","2381":"1","2500":"655685","2501":"544","2510":"7","2511":"0","2512":"4","2513":"148","2520":"259","2521":"0","2523":"259","2524":"0","2525":"0","2700":"322532622","2702":"3274","2703":"29715807","2704":"256968","2705":"40445","2706":"20892703","2707":"2985312","2708":"34063781","2709":"43993605","2710":"220597225","2728":"31638056","501":"-2900","509":"812700","511":"272400","605":"3276000","7476":"152622","7477":"0"},1421333798,1421333799,1421353598,"353270041540230","ZR315VSD",3,"N","India Standard Time",19800,"notification","Y","SmartBox","GA","GeneralShutdownWarningRules","Y","Y","N","","Y","M","1","Check ventilation/filters with customer / possible coating wear","M","7","ShutdownWarning cleared within 7 minutes","M","6","ShutdownWarning - repeating within 24 hours","V0.5"),"M","1","Check ventilation/filters with customer / possible coating wear")
+com.atlascopco.ctsconnectivity.SmartLinkSensorCheck(com.atlascopco.ctsconnectivity.SmartLinkRuleEvent("GeneralShutdownWarning","1003","486,15",{"1003":"486.15"},{"1000":"301.15","1001":"317.75","1004":"318.95","1005":"462.25","1102":"331.05","1203":"316.45","1204":"482.75","1207":"326.65","1700":"167.55160816","2100":"1","2101":"0","2124":"0","2304":"0","2305":"0","2306":"1","2307":"1","2310":"1","2311":"0","2312":"0","2313":"1","2381":"1","2500":"655685","2501":"544","2510":"7","2511":"0","2512":"4","2513":"148","2520":"259","2521":"0","2523":"259","2524":"0","2525":"0","2700":"322532622","2702":"3274","2703":"29715807","2704":"256968","2705":"40445","2706":"20892703","2707":"2985312","2708":"34063781","2709":"43993605","2710":"220597225","2728":"31638056","501":"-2900","509":"812700","511":"272400","605":"3276000","7476":"152622","7477":"0"},1421333798,1421333799,1421353598,"353270041540230","ZR315VSD",3,"N","India Standard Time",19800,"notification","Y","SmartBox","GA","GeneralShutdownWarningRules","Y","Y","N","","Y","M","1","Check ventilation/filters with customer / possible coating wear","M","7","ShutdownWarning cleared within 7 minutes","M","6","ShutdownWarning - repeating within 24 hours","V0.5"),"M","1","Check ventilation/filters with customer / possible coating wear")
+
+*/
+
+monitor OutputRules {
+
+	constant boolean DEBUG := false;
+	constant boolean DEBUGExcludedEvents := false;
+	Store ExcludedEventsStore;
+	Storage storage;
+	action onload {
+		SmartLinkOutputEvent o;
+
+		on StartExcludedEventStore() {
+			ExcludedEventsStore := storage.open("ExcludedEventsStore");
+
+			//if DEBUG then {on all wait(5.0) {	
+			//	RequestedExcludedEvent ReqExcEvent :=  processExcludedEventsRequests("353270041540230","","");
+			//}}
+			
+			
+			if DEBUG then {on all wait(300.0) {	print currentTime.toString();}}
+
+			if DEBUGExcludedEvents then { print "ExcludedEventsStore in OutputRules open"  ; }
+		}
+
+		on all unmatched SmartLinkOutputEvent():o {
+			/** To do :
+			-check suspend rules 
+			-check current planner/customer rules
+			*/
+
+			if DEBUG then {
+				log o.Level1 + o.Level2 +  o.Level3.toString() +  " C: " + o.EventInfo + " Event " + o.SmartLinkEvent.EventName +" Originator "  + " on Machine : " + o.SmartLinkEvent.CommunicationToken.toString() + " at : " + o.SmartLinkEvent.UtcTime.toString() + " (EventId : " + o.SmartLinkEvent.EventName + ")" at INFO;
+			}
+
+			RequestedExcludedEvent CheckIfExcluded := processExcludedEventsRequests(o.SmartLinkEvent.CommunicationToken,o.SmartLinkEvent.RegisterName,o.SmartLinkEvent.EventName); 
+			
+			if CheckIfExcluded.CommunicationToken = "NoneFound" then {
+			route com.atlascopco.ctsconnectivity.SmartLinkEventDb(o.EventKey,
+			                                                      o.SmartLinkEvent.CommunicationToken, 
+			                                                      o.SmartLinkEvent.EventName,
+			                                                      o.SmartLinkEvent.RegisterName,
+			                                                      "N/A",
+			                                                      o.SmartLinkEvent.Sensorvalue.toFloat(),
+			                                                      o.SmartLinkEvent.UtcTime.toFloat(),
+			                                                      o.SmartLinkEvent.LocalTime.toFloat(),
+			                                                      o.Level1,
+			                                                      o.Level2,
+			                                                      o.EventInfo,
+			                                                      "ThePlanner",
+			                                                      "Test Customer",
+			                                                      currentTime);
+			
+			if DEBUGExcludedEvents then  {    print "NotSuppressed event routed to SmartlinkDb";    }
+			
+			
+			}
+			
+			
+			else {
+				route com.atlascopco.ctsconnectivity.SmartLinkEventDb(o.EventKey,
+				                                                      o.SmartLinkEvent.CommunicationToken, 
+				                                                      o.SmartLinkEvent.EventName,
+				                                                      o.SmartLinkEvent.RegisterName,
+				                                                      "N/A",
+				                                                      o.SmartLinkEvent.Sensorvalue.toFloat(),
+				                                                      o.SmartLinkEvent.UtcTime.toFloat(),
+				                                                      o.SmartLinkEvent.LocalTime.toFloat(),
+				                                                      o.Level1,
+				                                                      o.Level2,
+				                                                      o.EventInfo + " (Suppressed event)",
+				                                                      "ThePlanner",
+				                                                      "Test Customer",
+				                                                      currentTime);			
+				if DEBUGExcludedEvents then  {    print "Suppressed event routed to SmartlinkDb";    }
+			}
+ 
+
+
+			if (o.Level2 = "1" or o.Level2 = "3" or o.Level2 = "5") and CheckIfExcluded.CommunicationToken = "NoneFound"  then
+			                                                      {								
+				route com.atlascopco.ctsconnectivity.SmartLinkDashboardEvent(o.SmartLinkEvent,o.Level1,o.Level2,o.EventInfo,"Customer1","Planner1",currentTime,"Open MR",o.EventKey);				
+			    
+				if DEBUGExcludedEvents then  {    print "Event routed to SmartlinkDashboard. Result ExcludedEventSearch: " + CheckIfExcluded.CommunicationToken.toString();    }
+			                                                      
+			                                                      }
+		}
+	}
+
+    /*Check if suppressed events are available in memorystore*/
+	action processExcludedEventsRequests(string CommunicationToken,string RegisterName, string EventName) returns RequestedExcludedEvent {
+
+		if DEBUGExcludedEvents then {print "Excluded Event DataRequest received: " + "tblExcludedEvents" + " " + RegisterName;}
+
+
+
+		string ExcludedEventKey := (CommunicationToken + "#" + EventName + "#" + RegisterName + "#EOL");
+		RequestedExcludedEvent ReqExcEvent := RequestedExcludedEvent(ExcludedEventKey,"NoneFound","","","","",-99,-99,-99);
+
+		if DEBUGExcludedEvents then {print "ExcludedEventRequestReceived: " + ExcludedEventKey.toString();}
+		Table tblExcludedEvents := ExcludedEventsStore.open("tblExcludedEvents"); 
+	
+		Row r:= tblExcludedEvents.get(ExcludedEventKey);
+
+
+
+		if r.inTable() then {
+
+			ReqExcEvent := RequestedExcludedEvent(
+			                                      r.getString("ExcludedEventKey"),
+			                                      r.getString("CommunicationToken"),
+			                                      r.getString("MachineSerialNumber"),
+			                                      r.getString("MachineId"),
+			                                      r.getString("EventName"),
+			                                      r.getString("RegisterName"),
+			                                      r.getInteger("ExpiryDate"),
+			                                      r.getInteger("DaysToSuppress"),
+			                                      r.getInteger("StartDate"));	
+		}
+
+		if DEBUGExcludedEvents then {print "Result search memstore: " +  "tblExcludedEvents" + ": " + ReqExcEvent.toString();}
+		return ReqExcEvent;		
+	}
+}

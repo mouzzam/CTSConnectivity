@@ -1,0 +1,60 @@
+﻿<?xml version="1.0"?>
+<rtview xmlns="www.sl.com" version="3.4">
+	<model file="com.sl.gmsjrtview.m_basemodel"
+		width="1200" height="800"
+		dockFillRows="1" dockFillColumns="0"
+		bgColor="0"
+		bg3dFlag="0"
+		bgBorderFlag="0"
+		bgGradientMode="0"
+		onOpenCommand="multiple system+cust+Apama_SetSub1.0.+selEventName%3D* system+cust+Apama_SetSub1.0.+selSuperVisionFlag%3DY"
+		bgGradientColor2="0"
+		bgBorderColor="7"
+		resizeWidthMin="0"
+		resizeHeightMin="0"
+		rtvRefreshInterval="">
+	</model>
+	<localvar name="__$instanceState" initValue="" dataType="scalar"/>
+	<localvar name="__$selEventName" initValue="*" dataType="scalar"/>
+	<localvar name="__$EventOverviewColMetric" initValue="LocalTimePres;SensorValueImperial;ImperialSymbol;Level1;EventInfo;UtcTime;RegisterName;EventKey;MachineEventHistoryId;CommunicationToken;MachineId;Timezone;URL;URLMD;HealthScoreFlag" dataType="scalar"/>
+	<localvar name="__$EventInfo" initValue="$EventInfo" dataType="scalar"/>
+	<localvar name="__$URLButton" initValue="" dataType="scalar"/>
+	<localvar name="__$URLMD" initValue="$URLMD" dataType="scalar"/>
+	<localvar name="__$HealthEnabled" initValue="" dataType="scalar"/>
+	<localvar name="__$apama_theme" initValue="" dataType="scalar"/>
+	<localvar name="__$apama_roles" initValue="" dataType="scalar"/>
+	<localvar name="__$apama_server_host" initValue="" dataType="scalar"/>
+	<localvar name="__$apama_server_port" initValue="" dataType="scalar"/>
+	<localvar name="__$EventKey" initValue="" dataType="scalar"/>
+	<localvar name="__$selSupervisionFlag" initValue="Y" dataType="scalar"/>
+	<localvar name="__$timestamp" initValue="" dataType="scalar"/>
+	<localvar name="__$RegisterName" initValue="" dataType="scalar"/>
+	<localvar name="__$LocalTime" initValue="" dataType="scalar"/>
+	<localvar name="__$apama_user" initValue="" dataType="scalar"/>
+	<localvar name="__$URLSubmitter" initValue="&amp;Submitter=" dataType="scalar"/>
+	<localvar name="__$selCustomerCenter" initValue="*" dataType="scalar"/>
+	<localvar name="__$EventHistoryId" initValue="" dataType="scalar"/>
+	<localvar name="__$MetricEnabled" initValue="1" dataType="scalar"/>
+	<localvar name="__$URL" initValue="$URL" dataType="scalar"/>
+	<localvar name="__$TicketStatus" initValue="" dataType="scalar"/>
+	<localvar name="__$apama_lang" initValue="" dataType="scalar"/>
+	<localvar name="__$UtcTime" initValue="" dataType="scalar"/>
+	<localvar name="__$TimeZone" initValue="" dataType="scalar"/>
+	<localvar name="__$CommunicationToken" initValue="" dataType="scalar"/>
+	<localvar name="__$MachineSerialNumber" initValue="" dataType="scalar"/>
+	<localvar name="__$Feedback" initValue="false" dataType="scalar"/>
+	<localvar name="__$EventName" initValue="" dataType="scalar"/>
+	<localvar name="__$ImperialEnabled" initValue="1" dataType="scalar"/>
+	<localvar name="__$instanceId" initValue="" dataType="scalar"/>
+	<object name="N91" class="obj_text01"
+		y="25.3125" x="2.0"
+		visFlag="1"
+		labelTextColor="16"
+		rotationAngle="0.0"
+		labelTextHeight="1.2"
+		labelTextFont="7"
+		labelTextAlignX="1"
+		labelTextAlignY="3">
+		<vardef varname="label" dsstring="local __$URLButton"/>
+	</object>
+</rtview>

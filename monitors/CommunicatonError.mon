@@ -1,0 +1,54 @@
+/** 
+*Title:         CommunicatonError
+*Description:   CommunicatonError
+*Author : AIR15581
+*/
+
+package com.atlascopco.ctsconnectivity;
+
+persistent monitor CommunicationError {
+
+	action onload() {		
+
+		SmartLinkRuleEvent CommunicationErrorEvent;
+
+		on all SmartLinkRuleEvent(EventName="CommunicationError"):CommunicationErrorEvent {
+			route SmartLinkRepeatCheck(CommunicationErrorEvent);
+		}		
+		
+		SmartLinkRuleEvent UploadFailed;
+		// Spawn Upload Monitor
+		on all SmartLinkRuleEvent(EventName="UploadFailed"):UploadFailed {
+			spawn Upload(UploadFailed);
+		}			
+	}
+
+
+	
+	action Upload(SmartLinkRuleEvent UploadFailed) {
+		/** UploadFailed logic
+		* Output C1 (Communication issue/Immediate action) in case no UploadRestored Event within 7 minutes otherwise C4 (Communication Issue/No Action needed)
+		*/
+			integer t;
+
+			string EventKey := UploadFailed.CommunicationToken + "#" + UploadFailed.EventName + "#" + UploadFailed.UtcTime.toString() + "#" + UploadFailed.RegisterName + "EOL";
+
+
+			on SmartLinkRuleEvent(EventName="UploadRestored", CommunicationToken=UploadFailed.CommunicationToken) within(420.0) {
+				
+
+					route com.atlascopco.ctsconnectivity.SmartLinkOutputEvent(UploadFailed,
+					                                                          UploadFailed.DelayLevel1,
+					                                                          UploadFailed.DelayLevel2,
+					                                                          false,
+					                                                          UploadFailed.EventInfo7Minutes,
+					                                                          currentTime,
+					                                                          EventKey);
+				die;				
+			}
+			
+			on wait(420.0) and not SMARTLINKEvent(EventName="UploadRestored", CommunicationToken=UploadFailed.CommunicationToken) {
+				route SmartLinkRepeatCheck(UploadFailed); 
+			}		
+	}
+}

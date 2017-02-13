@@ -1,0 +1,89 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dataplayer SYSTEM "http://www.apama.com/dtd/dp.dtd">
+<!-- Apama Data Player Query Configurations File -->
+
+<queryConfigs>
+  <query name="EventShort">
+    <datasourceName><![CDATA[ODBC]]></datasourceName>
+    <serviceId><![CDATA[com.apama.adbc.ODBC_DataPlayerSQL]]></serviceId>
+    <databaseName><![CDATA[AIRCONNECT_BI_DEV]]></databaseName>
+    <databaseFullName><![CDATA[ApamaSQLBI]]></databaseFullName>
+    <isNamedQuery><![CDATA[false]]></isNamedQuery>
+    <queryName><![CDATA[findAll]]></queryName>
+    <returnType><![CDATA[Native]]></returnType>
+    <transform><![CDATA[]]></transform>
+    <speed><![CDATA[1.0]]></speed>
+    <description><![CDATA[FetchEventsFromDB]]></description>
+    <queryString><![CDATA[select MachineEventHistoryId, MachineEventId, EventName, MachineId,  MachineRegisterId, 
+RegisterName, RegisterDescription, ValueMetric, UtcTime,  UtcTimePress, ReceivedTimePres  from dbo.apama_events
+order by utctime]]></queryString>
+    <parameters/>
+    <transformParameters/>
+    <includeTimeEvent><![CDATA[false]]></includeTimeEvent>
+    <eventType><![CDATA[SmartLinkEvent]]></eventType>
+    <timeColumn><![CDATA[UtcTime]]></timeColumn>
+  </query>
+  <query name="EventsFull">
+    <datasourceName><![CDATA[ODBC]]></datasourceName>
+    <serviceId><![CDATA[com.apama.adbc.ODBC_INSTANCE_1]]></serviceId>
+    <databaseName><![CDATA[ApamaSQLWrite]]></databaseName>
+    <databaseFullName><![CDATA[ApamaSQLWrite]]></databaseFullName>
+    <isNamedQuery><![CDATA[false]]></isNamedQuery>
+    <queryName><![CDATA[findAll]]></queryName>
+    <returnType><![CDATA[Native]]></returnType>
+    <transform><![CDATA[]]></transform>
+    <speed><![CDATA[1.0]]></speed>
+    <description><![CDATA[EventsFull]]></description>
+    <queryString><![CDATA[select * from stg.P_CEP_TestCaseResult
+order by time asc]]></queryString>
+    <parameters/>
+    <transformParameters/>
+    <includeTimeEvent><![CDATA[false]]></includeTimeEvent>
+    <eventType><![CDATA[unmapped-sql]]></eventType>
+    <timeColumn><![CDATA[time]]></timeColumn>
+  </query>
+  <query name="Stringified Events">
+    <datasourceName><![CDATA[ODBC]]></datasourceName>
+    <serviceId><![CDATA[com.apama.adbc.ODBC_INSTANCE_1]]></serviceId>
+    <databaseName><![CDATA[ApamaSQLWrite]]></databaseName>
+    <databaseFullName><![CDATA[ApamaSQLWrite]]></databaseFullName>
+    <isNamedQuery><![CDATA[false]]></isNamedQuery>
+    <queryName><![CDATA[findAll]]></queryName>
+    <returnType><![CDATA[Native]]></returnType>
+    <transform><![CDATA[]]></transform>
+    <speed><![CDATA[1.0]]></speed>
+    <description><![CDATA[Stringified Events]]></description>
+    <queryString><![CDATA[select * from stg.P_CEP_TestCaseEvents
+order by time asc]]></queryString>
+    <parameters/>
+    <transformParameters/>
+    <includeTimeEvent><![CDATA[false]]></includeTimeEvent>
+    <eventType><![CDATA[unmapped-sql]]></eventType>
+    <timeColumn><![CDATA[time]]></timeColumn>
+  </query>
+  <query name="TestEvent">
+    <datasourceName><![CDATA[ODBC]]></datasourceName>
+    <serviceId><![CDATA[com.apama.adbc.ODBC_ApamaSQLBI]]></serviceId>
+    <databaseName><![CDATA[ApamaSQLBI]]></databaseName>
+    <databaseFullName><![CDATA[ApamaSQLBI]]></databaseFullName>
+    <isNamedQuery><![CDATA[true]]></isNamedQuery>
+    <queryName><![CDATA[findAll]]></queryName>
+    <returnType><![CDATA[Native]]></returnType>
+    <transform><![CDATA[]]></transform>
+    <speed><![CDATA[1.0]]></speed>
+    <description><![CDATA[TestEvent]]></description>
+    <queryString><![CDATA[select *  from apama_test_events]]></queryString>
+    <parameters>
+      <parameterData name="TABLE_NAME" value="apama_test_events" type="String" description="Name of a table to query" defaultValue="">
+        <extraParams class="linked-hash-map"/>
+      </parameterData>
+    </parameters>
+    <transformParameters/>
+    <extraParameters>
+      <parameter name="timeColumn" value="CreatedUtcTime"/>
+    </extraParameters>
+    <includeTimeEvent><![CDATA[false]]></includeTimeEvent>
+    <eventType><![CDATA[com.atlascopco.ctsconnectivity.TestEvent]]></eventType>
+    <timeColumn><![CDATA[time]]></timeColumn>
+  </query>
+</queryConfigs>

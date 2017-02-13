@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+	This file contains the "user defined" elements of the ADBC adapter
+	configuration, i.e. the event mapping parts of the configuration that are
+	specific to a user's application. These elements are included in the main
+	configuration file using the XInclude directive as shown below:
+
+	<xi:include href="ADBC-application.xml" xpointer="xpointer(//event)" />
+
+	Note that in order to comply with the configuration file DTD, the
+	<adapter-config> element should also contain a "xmlns:xi" attribute as
+	shown below:
+
+	<adapter-config xmlns:xi="http://www.w3.org/2001/XInclude">
+
+
+	$Copyright (c) 2009, 2012 Progress Software Corporation. All rights reserved. $
+	$Copyright (c) 2013 Software AG, Darmstadt, Germany and/or Software AG USA Inc., Reston, VA, USA, and/or its Subsidiaries and or/its Affiliates and/or their licensors.$
+	Use, reproduction, transfer, publication or disclosure is prohibited except as specifically provided for in your License Agreement with Software AG
+
+-->
+
+<mapping xmlns:xi="http://www.w3.org/2001/XInclude">
+
+	<!--  To return Historical events from Sim files an upstream mapping is needed  -->
+	<event name="Tick" encoder="NullCodec" direction="both" copyUnmappedToDictionaryPayload="false" inject="false">
+		<id-rules>
+			<downstream>
+				<id fields="_ADBCType" test="==" value="Tick"/>
+			</downstream>
+			<upstream/>
+		</id-rules>
+		<mapping-rules>
+			<map apama="symbol" type="string" default="" transport="symbol"/>
+			<map apama="price" type="float" default="0.0" transport="price"/>
+			<map apama="quantity" type="integer" default="0" transport="volume" />
+			<map apama="extraParams" type="reference" referencetype="dictionary&lt;string, string&gt;" transport="extraParams" default="{}"/>
+		</mapping-rules>
+	</event>
+	<!--  To return Historical events from Sim files an upstream mapping is needed  -->
+	<event name="Trade" encoder="NullCodec" direction="both" copyUnmappedToDictionaryPayload="false" inject="false">
+		<id-rules>
+			<downstream>
+				<id fields="_ADBCType" test="==" value="Trade"/>
+			</downstream>
+			<upstream/>
+		</id-rules>
+		<mapping-rules>
+			<map apama="symbol" type="string" default="" transport="symbol"/>
+			<map apama="price" type="float" default="0.0" transport="price"/>
+			<map apama="volume" type="integer" default="0" transport="volume"/>
+			<map apama="time" type="float" default="0.0" transport="time"/>
+			<map apama="seq" type="integer" default="0" transport="seq"/>
+		</mapping-rules>
+	</event>
+
+</mapping>

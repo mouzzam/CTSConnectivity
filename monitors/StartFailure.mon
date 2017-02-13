@@ -1,0 +1,66 @@
+//*****************************************************************************
+// Title:         StartFailure
+// Description:   StartFailure description
+// Dependencies:  None
+// Author:        AIR15581
+//
+//*****************************************************************************
+package com.atlascopco.ctsconnectivity;
+
+persistent monitor StartFailure {
+	
+dictionary<string, sequence<string> > RuleOutput;
+		
+	action onload() {				
+		SmartLinkRuleEvent StartFailureEvent;
+		
+		on all SmartLinkRuleEvent(EventName="GeneralStartFailure",Delay="Y"//, Repeated="N"
+		                          ):StartFailureEvent {
+			spawn StartFailure(StartFailureEvent);
+		}		
+	}
+	
+	action StartFailure(SmartLinkRuleEvent StartFailureEvent) {
+		/** StartFailure logic
+		* Check for clear event/bit for 7 minutes
+		* If no clear => output
+		*/
+		
+		string EventKey := StartFailureEvent.CommunicationToken + "#" + StartFailureEvent.EventName + "#" + StartFailureEvent.UtcTime.toString() + "#" + StartFailureEvent.RegisterName + "EOL";
+
+		
+			on (SmartLinkRuleEvent(EventName="GeneralShutdownCleared", CommunicationToken=StartFailureEvent.CommunicationToken) or SMARTLINKCompressorState(GeneralShutdownWarningState=0,CommunicationToken=StartFailureEvent.CommunicationToken)) within(420.0)  {		   	
+					route SmartLinkOutputEvent(StartFailureEvent,
+					                           StartFailureEvent.DelayLevel1,
+					                           StartFailureEvent.DelayLevel2,
+					                           false,
+					                           StartFailureEvent.EventInfo7Minutes,
+					                           currentTime,
+					                           EventKey);
+				die;
+			}
+
+			on wait(420.0) and (not SmartLinkRuleEvent(EventName="GeneralShutdownCleared", CommunicationToken=StartFailureEvent.CommunicationToken) and not SMARTLINKCompressorState(GeneralShutdownWarningState=0,CommunicationToken=StartFailureEvent.CommunicationToken)) {   		          		  
+
+				if StartFailureEvent.SensorCheck = "Y" then
+				{
+					route SmartLinkSensorCheck(StartFailureEvent,
+					                           StartFailureEvent.DefaultOutputLevel1,
+					                           StartFailureEvent.DefaultOutputLevel2,
+					                           StartFailureEvent.DefaultEventInfo);				                           
+
+				}
+				else
+				{
+					route SmartLinkOutputEvent(StartFailureEvent,
+					                           StartFailureEvent.DefaultOutputLevel1,
+					                           StartFailureEvent.DefaultOutputLevel2,
+					                           false,
+					                           StartFailureEvent.DefaultEventInfo,
+					                           currentTime,
+					                           EventKey);						                           
+				}
+				die;	
+			} 		
+	}
+}

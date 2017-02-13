@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?><configuration>
+<intAttribute key="com.apama.text.CONFIG_VERSION" value="3"/>
+<listAttribute key="com.apama.text.COMPONENTS">
+<listEntry>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<component clear="false" correlatorLog="true" correlatorLogLocation="logs/${LAUNCH_CONFIG_NAME}_${CORRELATOR_NAME}.output.log" dataLocationDir="${project_loc:CTSConnectivityV2}/database/Default Correlator" distMemoryStoreEnabled="false" enabled="true" extraArguments="" hostname="localhost" inputLog="true" inputLogLocation="logs/Default_Correlator_${START_TIME}_${ID}.input.log" isAutomaticOrdering="false" isPeristanceEnabled="false" javaEnabled="false" jmsResiliencyEnabled="false" logLevel="INFO" maxMBLocalHeap="512" maxMBLocalHeapEnabled="false" maxMBLocalOffHeap="16384" maxMBLocalOffHeapEnabled="false" name="Default Correlator" persistenceStartupOption="RESUME" port="15904" reuse="false" type="CORRELATOR" umConfigurationEnabled="false" workingDir="/CTSConnectivityV2">
+<runtimeDependencyEntry enabled="true" path="${APAMA_HOME}/adapters/monitors/ADBCAdapterEvents.mon" type="PROJECT_BUNDLE_MON_FILE">
+<attributes>
+<attribute name="origin" value="ADAPTER_CATALOG"/>
+<attribute name="bundle-name" value="ADBC Adapter common"/>
+<attribute name="bundle-display-name" value="ADBC Adapter common"/>
+<attribute name="origin-path" value=""/>
+<attribute name="bundle-file" value="ADBC-ODBC.bnd"/>
+</attributes>
+</runtimeDependencyEntry>
+<runtimeDependencyEntry enabled="true" path="${APAMA_HOME}/adapters/monitors/ADBCEvents.mon" type="PROJECT_BUNDLE_MON_FILE">
+<attributes>
+<attribute name="origin" value="ADAPTER_CATALOG"/>
+<attribute name="bundle-name" value="ADBC Adapter common"/>
+<attribute name="bundle-display-name" value="ADBC Adapter common"/>
+<attribute name="origin-path" value=""/>
+<attribute name="bundle-file" value="ADBC-ODBC.bnd"/>
+</attributes>
+</runtimeDependencyEntry>
+<runtimeDependencyEntry enabled="true" path="${APAMA_HOME}/monitors/StatusSupport.mon" type="PROJECT_BUNDLE_MON_FILE">
+<attributes>
+<attribute name="origin" value="ADAPTER_CATALOG"/>
+<attribute name="bundle-name" value="Status Support"/>
+<attribute name="bundle-display-name" value="Status Support"/>
+<attribute name="origin-path" value=""/>
+<attribute name="bundle-file" value="ADBC-ODBC.bnd"/>
+</attributes>
+</runtimeDependencyEntry>
+<runtimeDependencyEntry enabled="true" path="${APAMA_HOME}/adapters/monitors/ADBCHelper.mon" type="PROJECT_BUNDLE_MON_FILE">
+<attributes>
+<attribute name="origin" value="ADAPTER_CATALOG"/>
+<attribute name="bundle-name" value="ADBC Adapter common"/>
+<attribute name="bundle-display-name" value="ADBC Adapter common"/>
+<attribute name="origin-path" value=""/>
+<attribute name="bundle-file" value="ADBC-ODBC.bnd"/>
+</attributes>
+</runtimeDependencyEntry>
+<runtimeDependencyEntry enabled="true" path="${APAMA_HOME}/monitors/data_storage/MemoryStore.mon" type="PROJECT_BUNDLE_MON_FILE">
+<attributes>
+<attribute name="origin" value="PRODUCT_CATALOG"/>
+<attribute name="bundle-name" value="The MemoryStore"/>
+<attribute name="bundle-display-name" value="The MemoryStore"/>
+<attribute name="origin-path" value=""/>
+<attribute name="bundle-file" value="MemoryStore.bnd"/>
+</attributes>
+</runtimeDependencyEntry>
+<runtimeDependencyEntry enabled="true" path="${APAMA_HOME}/adapters/monitors/ADBCAdapterService.mon" type="PROJECT_BUNDLE_MON_FILE">
+<attributes>
+<attribute name="origin" value="ADAPTER_CATALOG"/>
+<attribute name="bundle-name" value="ADBC Adapter common"/>
+<attribute name="bundle-display-name" value="ADBC Adapter common"/>
+<attribute name="origin-path" value=""/>
+<attribute name="bundle-file" value="ADBC-ODBC.bnd"/>
+</attributes>
+</runtimeDependencyEntry>
+<runtimeDependencyEntry enabled="true" path="${APAMA_HOME}/monitors/scenario_support/ScenarioDeleterSupport.mon" type="PROJECT_BUNDLE_MON_FILE">
+<attributes>
+<attribute name="origin" value="PRODUCT_CATALOG"/>
+<attribute name="bundle-name" value="Scenario Service"/>
+<attribute name="bundle-display-name" value="Scenario Service"/>
+<attribute name="origin-path" value=""/>
+<attribute name="bundle-file" value="MemoryStore.bnd"/>
+</attributes>
+</runtimeDependencyEntry>
+<runtimeDependencyEntry enabled="true" path="../../monitors/IAFStatusManager.mon" type="PROJECT_BUNDLE_MON_FILE">
+<attributes>
+<attribute name="origin" value="ADAPTER_CATALOG"/>
+<attribute name="bundle-name" value="IAF Status Manager"/>
+<attribute name="bundle-display-name" value="IAF Status Manager"/>
+<attribute name="origin-path" value=""/>
+<attribute name="bundle-file" value="ADBC-ODBC.bnd"/>
+</attributes>
+</runtimeDependencyEntry>
+<runtimeDependencyEntry enabled="true" path="${APAMA_HOME}/adapters/monitors/ADBCStatusManager.mon" type="PROJECT_BUNDLE_MON_FILE">
+<attributes>
+<attribute name="origin" value="ADAPTER_CATALOG"/>
+<attribute name="bundle-name" value="ADBC Adapter common"/>
+<attribute name="bundle-display-name" value="ADBC Adapter common"/>
+<attribute name="origin-path" value=""/>
+<attribute name="bundle-file" value="ADBC-ODBC.bnd"/>
+</attributes>
+</runtimeDependencyEntry>
+<runtimeDependencyEntry enabled="true" path="${APAMA_HOME}/monitors/DataViewService_Interface.mon" type="PROJECT_BUNDLE_MON_FILE">
+<attributes>
+<attribute name="origin" value="PRODUCT_CATALOG"/>
+<attribute name="bundle-name" value="DataView Service"/>
+<attribute name="bundle-display-name" value="DataView Service"/>
+<attribute name="origin-path" value=""/>
+<attribute name="bundle-file" value="DataViewService.bnd"/>
+</attributes>
+</runtimeDependencyEntry>
+<runtimeDependencyEntry enabled="true" path="${APAMA_HOME}/monitors/ScenarioService.mon" type="PROJECT_BUNDLE_MON_FILE">
+<attributes>
+<attribute name="origin" value="PRODUCT_CATALOG"/>
+<attribute name="bundle-name" value="Scenario Service"/>
+<attribute name="bundle-display-name" value="Scenario Service"/>
+<attribute name="origin-path" value=""/>
+<attribute name="bundle-file" value="MemoryStore.bnd"/>
+</attributes>
+</runtimeDependencyEntry>
+<runtimeDependencyEntry enabled="true" path="${APAMA_HOME}/monitors/DataViewService_Impl_Dict.mon" type="PROJECT_BUNDLE_MON_FILE">
+<attributes>
+<attribute name="origin" value="PRODUCT_CATALOG"/>
+<attribute name="bundle-name" value="DataView Service"/>
+<attribute name="bundle-display-name" value="DataView Service"/>
+<attribute name="origin-path" value=""/>
+<attribute name="bundle-file" value="DataViewService.bnd"/>
+</attributes>
+</runtimeDependencyEntry>
+<runtimeDependencyEntry enabled="true" path="${APAMA_HOME}/monitors/data_storage/MemoryStoreScenarioImpl.mon" type="PROJECT_BUNDLE_MON_FILE">
+<attributes>
+<attribute name="origin" value="PRODUCT_CATALOG"/>
+<attribute name="bundle-name" value="The MemoryStore"/>
+<attribute name="bundle-display-name" value="The MemoryStore"/>
+<attribute name="origin-path" value=""/>
+<attribute name="bundle-file" value="MemoryStore.bnd"/>
+</attributes>
+</runtimeDependencyEntry>
+<runtimeDependencyEntry enabled="true" path="/CTSConnectivityV2/eventdefinitions/CTSConnectivityEvents.mon" type="PROJECT_MON_FILE"/>
+<runtimeDependencyEntry enabled="true" path="/CTSConnectivityV2/bundle_instance_files/Adapter_for_ODBC/GeneratedMonitors/ADBC-ODBC_instance_1.mon" type="PROJECT_MON_FILE"/>
+<runtimeDependencyEntry enabled="true" path="/CTSConnectivityV2/bundle_instance_files/Adapter_for_ODBC/GeneratedMonitors/ADBC-ODBC_instance2.mon" type="PROJECT_MON_FILE"/>
+<runtimeDependencyEntry enabled="true" path="/CTSConnectivityV2/monitors/GeneralShutdown.mon" type="PROJECT_MON_FILE"/>
+<runtimeDependencyEntry enabled="false" path="/CTSConnectivityV2/monitors/SystemMonitor.mon" type="PROJECT_MON_FILE"/>
+<runtimeDependencyEntry enabled="false" path="/CTSConnectivityV2/monitors/ServiceWarning.mon" type="PROJECT_MON_FILE"/>
+<runtimeDependencyEntry enabled="true" path="/CTSConnectivityV2/eventdefinitions/SendMailEvents.mon" type="PROJECT_MON_FILE"/>
+<runtimeDependencyEntry enabled="true" path="/CTSConnectivityV2/monitors/EmailTest.mon" type="PROJECT_MON_FILE"/>
+<runtimeDependencyEntry enabled="true" path="/CTSConnectivityV2/monitors/SensorChecks.mon" type="PROJECT_MON_FILE"/>
+<runtimeDependencyEntry enabled="true" path="/CTSConnectivityV2/monitors/PrepareMemStorGetAggregates.mon" type="PROJECT_MON_FILE"/>
+<runtimeDependencyEntry enabled="true" path="/CTSConnectivityV2/monitors/StartFailure.mon" type="PROJECT_MON_FILE"/>
+<runtimeDependencyEntry enabled="true" path="/CTSConnectivityV2/monitors/EventDashboard.mon" type="PROJECT_MON_FILE"/>
+<runtimeDependencyEntry enabled="true" path="/CTSConnectivityV2/monitors/BatteryFailure.mon" type="PROJECT_MON_FILE"/>
+<runtimeDependencyEntry enabled="true" path="/CTSConnectivityV2/monitors/GeneralRules.mon" type="PROJECT_MON_FILE"/>
+<runtimeDependencyEntry enabled="true" path="/CTSConnectivityV2/monitors/GeneralWarning.mon" type="PROJECT_MON_FILE"/>
+<runtimeDependencyEntry enabled="false" path="/CTSConnectivityV2/monitors/CommunicatonError.mon" type="PROJECT_MON_FILE"/>
+<runtimeDependencyEntry enabled="true" path="/CTSConnectivityV2/monitors/GeneralShutDownWarning.mon" type="PROJECT_MON_FILE"/>
+<runtimeDependencyEntry enabled="true" path="/CTSConnectivityV2/monitors/CheckRepeat.mon" type="PROJECT_MON_FILE"/>
+<runtimeDependencyEntry enabled="true" path="/CTSConnectivityV2/monitors/OutputRules.mon" type="PROJECT_MON_FILE"/>
+<runtimeDependencyEntry enabled="true" path="/CTSConnectivityV2/monitors/MasterDataReader.mon" type="PROJECT_MON_FILE"/>
+<runtimeDependencyEntry enabled="false" path="/CTSConnectivityV2/monitors/checkmachinestate.mon" type="PROJECT_MON_FILE"/>
+<runtimeDependencyEntry enabled="true" path="/CTSConnectivityV2/events/ADBC-ODBC_instance_1.evt" type="PROJECT_EVENT_FILE"/>
+<runtimeDependencyEntry enabled="true" path="/CTSConnectivityV2/events/MailConfiguration.evt" type="PROJECT_EVENT_FILE"/>
+<runtimeDependencyEntry enabled="true" path="/CTSConnectivityV2/events/SmartLinkRegisterConverter.evt" type="PROJECT_EVENT_FILE"/>
+<runtimeDependencyEntry enabled="true" path="/CTSConnectivityV2/events/DetailedRuleOutputDefinition.evt" type="PROJECT_EVENT_FILE"/>
+</component>
+</listEntry>
+<listEntry>
+
+
+
+<component enabled="true" extraArguments="" name="instance 1" port="16904" propertiesFile="bundle_instance_files/Adapter_for_ODBC/ADBC-ODBC_instance_1.properties" type="ADAPTER" umConfigurationEnabled="false" workingDir="/CTSConnectivityV2"/>
+</listEntry>
+</listAttribute>
+<booleanAttribute key="com.apama.text.OPEN_DASHBOARD_ATTR" value="false"/>
+<booleanAttribute key="com.apama.text.OPEN_DEFAULT_DASHBOARD_ATTR" value="true"/>
+<stringAttribute key="com.apama.text.DASHBOARD_PATH_ATTR" value="dashboards/EventDashboard.rtv"/>
+<booleanAttribute key="com.apama.text.OPEN_ENABLE_DATAPLAYER_MODE_ATTR" value="false"/>
+<booleanAttribute key="com.apama.text.GENERATE_TIME_EVENTS_ATTR" value="true"/>
+<stringAttribute key="com.apama.text.DASHBOARD_VIEWER_ARGS" value=""/>
+</configuration>

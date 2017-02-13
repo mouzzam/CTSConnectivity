@@ -1,0 +1,72 @@
+//*****************************************************************************
+// Title:         GeneralShutdown
+// Description:   GeneralShutdown description
+// Dependencies:  None
+// Author:        AIR15396
+//
+//*****************************************************************************
+
+package com.atlascopco.ctsconnectivity;
+
+// TODO: Monitors and event definitions here
+
+persistent monitor GeneralShutdown {
+	
+	boolean DEBUG := false;
+	
+	action onload() {		
+		SmartLinkRuleEvent GeneralShutdown;
+				
+		on all SmartLinkRuleEvent(EventName="GeneralShutdown"//,Delay="Y", Repeated="N"
+		                          ):GeneralShutdown {
+			spawn GeneralShutdownHandler(GeneralShutdown);
+			
+			
+				if DEBUG then {
+				
+				print  "NEW SHUTDOWN_SmartlinkRuleEvent" + GeneralShutdown.toString();
+			}
+			
+			
+			
+		}	
+	}
+	
+	action GeneralShutdownHandler(SmartLinkRuleEvent GeneralShutdown) {
+		/** GeneralShutdown logic
+		* Check for clear event/bit for 7 minutes
+		* If no clear => output
+		* Output based on lookup in dictionary
+		*/
+		
+		          		string EventKey := GeneralShutdown.CommunicationToken + "#" + GeneralShutdown.EventName + "#" + GeneralShutdown.UtcTime.toString() + "#" + GeneralShutdown.RegisterName + "EOL";
+
+		
+			on 
+				(
+						SmartLinkRuleEvent(EventName="GeneralShutdownCleared", CommunicationToken=GeneralShutdown.CommunicationToken, UtcTime <= GeneralShutdown.UtcTime+420) 
+					or 
+						SMARTLINKCompressorState(GeneralShutdownWarningState=0,CommunicationToken=GeneralShutdown.CommunicationToken, UtcTime <= GeneralShutdown.UtcTime+420)
+						) 
+			   within(420.0)  
+				{		   
+					route SmartLinkOutputEvent(GeneralShutdown, GeneralShutdown.DelayLevel1, GeneralShutdown.DelayLevel2, false, GeneralShutdown.EventInfo7Minutes, currentTime,EventKey); 									
+				die;
+			}
+
+			on wait(420.0) and (not SmartLinkRuleEvent(EventName="GeneralShutdownCleared", CommunicationToken=GeneralShutdown.CommunicationToken) and not SMARTLINKCompressorState(GeneralShutdownWarningState=0,CommunicationToken=GeneralShutdown.CommunicationToken)) {   		          		  
+
+				
+				if GeneralShutdown.SensorCheck = "Y" then
+				{
+					route SmartLinkSensorCheck(GeneralShutdown, GeneralShutdown.DefaultOutputLevel1, GeneralShutdown.DefaultOutputLevel2, GeneralShutdown.DefaultEventInfo); 									
+					
+				}
+				else
+				{
+					route SmartLinkOutputEvent(GeneralShutdown,GeneralShutdown.DefaultOutputLevel1, GeneralShutdown.DefaultOutputLevel2, false,GeneralShutdown.DefaultEventInfo,currentTime,EventKey); 									
+				}			
+				die;
+			} 		
+	}
+}

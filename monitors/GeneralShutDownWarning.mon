@@ -1,0 +1,51 @@
+//*****************************************************************************
+// Title:         GeneralShutDownWarning
+// Description:   GeneralShutDownWarning description
+// Dependencies:  None
+// Author:        AIR15396
+//
+//*****************************************************************************
+
+package com.atlascopco.ctsconnectivity;
+
+// TODO: Monitors and event definitions here
+
+persistent monitor GeneralShutDownWarning {
+	
+	action onload() {			
+		SmartLinkRuleEvent ShutdownWarning;
+		
+		on all SmartLinkRuleEvent(EventName="GeneralShutdownWarning"):ShutdownWarning {
+			spawn GeneralShutDownWarning(ShutdownWarning);
+		}		
+	}
+	
+	action GeneralShutDownWarning(SmartLinkRuleEvent GeneralShutdownWarning) {
+		
+		/** Warning logic
+		* Check for clear event/bit for 7 minutes
+		* If no clear => check for repeating (period depends on originator)
+		* If not repeating => check sensors for cause (depends on originator)
+		* A lot of servicewarning are operational/marketing related so output = NA - 4 => not relevant for monitoring room
+		*/
+
+  		string EventKey := GeneralShutdownWarning.CommunicationToken + "#" + GeneralShutdownWarning.EventName + "#" + GeneralShutdownWarning.UtcTime.toString() + "#" + GeneralShutdownWarning.RegisterName + "EOL";
+
+		
+			on SMARTLINKEvent(EventName="GeneralWarningCleared", CommunicationToken=GeneralShutdownWarning.CommunicationToken) within(420.0) {
+					route SmartLinkOutputEvent(GeneralShutdownWarning,
+					                           GeneralShutdownWarning.DelayLevel1,
+					                           GeneralShutdownWarning.DelayLevel2,
+					                           false,
+					                           GeneralShutdownWarning.EventInfo7Minutes,
+					                           currentTime,
+					                           EventKey);
+				die;				
+			}
+			
+			on wait(420.0) and not SMARTLINKEvent(EventName="GeneralWarningCleared", CommunicationToken=GeneralShutdownWarning.CommunicationToken) {			
+				route SmartLinkRepeatCheck(GeneralShutdownWarning);
+				die;
+			}
+	}
+}

@@ -1,0 +1,43 @@
+//*****************************************************************************
+// Title:         GeneralRules
+// Description:   GeneralRules description
+// Dependencies:  None
+// Author:        AIR15581
+//
+//*****************************************************************************
+package com.atlascopco.ctsconnectivity;
+
+monitor GeneralRules {
+	
+	action onload() {
+		NoDelayNoFocusRules();		
+		}
+	
+	action NoDelayNoFocusRules {
+
+		/**
+		*  Rules with If then else logic - not need to check the for the machineid or patterns
+		*/
+		
+		
+		SmartLinkRuleEvent NoDelayNoFocusRulesEvent;
+		
+
+		on all SmartLinkRuleEvent(Delay="N"//, Repeated="N"
+		                          ,SensorCheck="N"):NoDelayNoFocusRulesEvent  {
+			
+			
+			string EventKey := NoDelayNoFocusRulesEvent.CommunicationToken + "#" + NoDelayNoFocusRulesEvent.EventName + "#" + NoDelayNoFocusRulesEvent.UtcTime.toString() + "#" + NoDelayNoFocusRulesEvent.RegisterName + "EOL";
+
+		
+				route SmartLinkOutputEvent(NoDelayNoFocusRulesEvent,
+				                           NoDelayNoFocusRulesEvent.DefaultOutputLevel1,
+				                           NoDelayNoFocusRulesEvent.DefaultOutputLevel2,
+				                           false,
+				                           NoDelayNoFocusRulesEvent.DefaultEventInfo,
+				                           currentTime,
+				                           EventKey);     
+		}
+	}
+		
+}

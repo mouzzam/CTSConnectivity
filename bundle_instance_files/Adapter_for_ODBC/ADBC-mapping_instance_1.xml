@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mapping>
+  <event direction="upstream" encoder="none" name="invalid">
+    <id-rules>
+      <upstream/>
+    </id-rules>
+    <mapping-rules/>
+  </event>
+  <event copyUnmappedToDictionaryPayload="false" direction="both"
+    encoder="NullCodec" inject="false" name="SmartLinkEventDb" package="com.atlascopco.ctsconnectivity">
+    <id-rules>
+      <downstream>
+        <id fields="_ADBCType" test="==" value="com.atlascopco.ctsconnectivity.SmartLinkEventDb"/>
+      </downstream>
+      <upstream/>
+    </id-rules>
+    <mapping-rules>
+      <map apama="EventKey" default="" transport="EventKey" type="string"/>
+      <map apama="CommunicationToken" default=""
+        transport="CommunicationToken" type="string"/>
+      <map apama="EventName" default="" transport="EventName" type="string"/>
+      <map apama="RegisterName" default="" transport="RegisterName" type="string"/>
+      <map apama="RegisterDescription" default=""
+        transport="RegisterDescription" type="string"/>
+      <map apama="Sensorvalue" default="0.0" transport="SensorValue" type="float"/>
+      <map apama="UtcTime" default="0.0" transport="UtcTime" type="float"/>
+      <map apama="LocalTime" default="0.0" transport="LocalTime" type="float"/>
+      <map apama="Level1" default="" transport="Level1" type="string"/>
+      <map apama="Level2" default="" transport="Level2" type="string"/>
+      <map apama="EventInfo" default="" transport="EventInfo" type="string"/>
+      <map apama="AssignedTo" default="" transport="AssignedTo" type="string"/>
+      <map apama="Customer" default="" transport="Customer" type="string"/>
+      <map apama="InsertedOn" default="0.0" type="float"/>
+    </mapping-rules>
+  </event>
+  <event copyUnmappedToDictionaryPayload="false" direction="both"
+    encoder="NullCodec" inject="false" name="OutputConclusionToDatabase" package="com.atlascopco.ctsconnectivity">
+    <id-rules>
+      <downstream>
+        <id fields="_ADBCType" test="==" value="com.atlascopco.ctsconnectivity.OutputConclusionToDatabase"/>
+      </downstream>
+      <upstream/>
+    </id-rules>
+    <mapping-rules>
+      <map apama="EventKey" default="" transport="EventKey" type="string"/>
+      <map apama="CommunicationToken" default=""
+        transport="CommunicationToken" type="string"/>
+      <map apama="RuleKey" default="" transport="RuleKey" type="string"/>
+      <map apama="Type" default="" transport="Type" type="string"/>
+      <map apama="Conclusion" default="" transport="Conclusion" type="string"/>
+      <map apama="CheckMatched" default="" transport="CheckMatched" type="string"/>
+      <map apama="level1" default="" transport="Level1" type="string"/>
+      <map apama="level2" default="" transport="Level2" type="string"/>
+      <map apama="EventInfo" default="" transport="EventInfo" type="string"/>
+      <map apama="Generalcheck" default="" transport="GeneralCheck" type="string"/>
+      <map apama="DezideId1" default="" transport="DezideId1" type="string"/>
+      <map apama="DezideId2" default="" transport="DezideId2" type="string"/>
+      <map apama="CurrentTime" default="0" type="integer"/>
+    </mapping-rules>
+  </event>
+</mapping>

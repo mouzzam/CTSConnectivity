@@ -1,0 +1,447 @@
+//*****************************************************************************
+//Title:         Aggregates
+//Description:   Aggregates description
+//Dependencies:  None
+//Author:        AIR15396
+
+//*****************************************************************************
+
+package com.atlascopco.ctsconnectivity;
+
+
+using com.apama.memorystore.Storage;
+using com.apama.memorystore.Store;
+using com.apama.memorystore.Table;
+using com.apama.memorystore.Schema;
+using com.apama.memorystore.Iterator;
+using com.apama.memorystore.Finished;
+using com.apama.memorystore.Row;
+using com.apama.memorystore.RowChanged;
+ 
+
+
+
+monitor ADBCHelper_Example
+{
+	boolean DEBUG := false;
+	boolean DEBUGMemStoreLoad := false;
+	
+	//Define name of the store (as it will be saved on disk)
+	constant string strNameAggregates := "AggregatesStore";
+	constant string strNameConclusions := "ConclusionsStore";
+	constant string strNameExcludedEvents := "ExcludedEventsStore";
+	
+	//Declare stores
+	Store AggregatesStore;
+	Store ConclusionsStore;
+	Store ExcludedEventsStore;	
+	
+	//Define name of the tables
+	constant string TABLE_NAME:= "SSIS_Aggregates";
+	constant string TABLE_NAME3:= "Event_Conclusions";
+	constant string TABLE_NAME4:= "tblDefaultRuleOutputDefinitions";
+	constant string Table_Name_ExcludedEvents:= "tblExcludedEvents";
+
+	//Declare schema of the tables
+	sequence<string> SCHEMA_NAMES := ["aggregatekey", "machineid","registername","numberofdays","value","latestsensorutc","itemcount","updatedon","insertedon"];
+	sequence<string> SCHEMA_TYPES := ["string", "integer","string","integer","float","integer","integer","integer","integer"];
+
+	sequence<string> SCHEMA_NAMES3 := ["eventkey","communicationtoken","ruleid","type","conclusion","level1","level2","eventinfo","generalcheck","insertedon","DezideId1","DezideId2"];
+	sequence<string> SCHEMA_TYPES3 := ["string", "string","string","string","string","string","string","string","boolean","integer","string","string"];
+	
+	sequence<string> SCHEMA_NAMES4 := ["definitionkey","RuleSet","RuleKey","CheckMatched","EventName","CheckRegister","RegisterName","RegisterDescription","OutputLevel1","OutputLevel2","BasicEventInfo","EventInfo","RuleVersion"];
+	sequence<string> SCHEMA_TYPES4 := ["string","string","string","string","string","string","string","string","string","string","string","string","string"];
+	
+	sequence<string> SCHEMA_NAMES_ExcludedEvents := ["ExcludedEventKey","CommunicationToken","MachineSerialNumber","MachineId","EventName","RegisterName","ExpiryDate","DaysToSuppress","StartDate"];
+	sequence<string> SCHEMA_TYPES_ExcludedEvents := ["string","string","string","string","string","string","integer","integer","integer"];
+	
+	
+	//Declare storage
+	Storage storage;
+	
+	//Declare tables
+	Table tblSSIS_Aggregates;
+	Table tblEvent_Conclusions;
+	Table tblRuleOutputDefinitions;
+	Table tblExcludedEvents;
+	//Database
+	com.apama.database.DBUtil db;
+	action onload {
+		
+		string adapterInstanceName := "INSTANCE_1";
+		db.setAdapterInstanceName(adapterInstanceName);
+
+		prepareStore(strNameAggregates,AggregatesStore);
+		prepareStore(strNameExcludedEvents,ExcludedEventsStore);
+		prepareStore(strNameConclusions,ConclusionsStore);
+		
+
+		/** Start Daily aggregates reload */
+
+		on all wait(1801.0) {
+		
+			tblExcludedEvents.clear();
+			integer i := tblExcludedEvents.persist();
+			loadAggregatesData();
+		}
+		
+		on wait(10.0)
+		{
+			
+			tblExcludedEvents.clear();
+			integer i := tblExcludedEvents.persist();
+			loadAggregatesData();
+		}
+				
+	}
+
+	action handleError( string reason) {
+		log "DB Error: " + reason at ERROR;
+	}
+
+	/** Open the store. */
+	action prepareStore(string StoreName, Store store ) 
+	{
+		Finished f;
+		on Finished(id = storage.prepareOrCreate(StoreName,StoreName + ".store")):f 
+		{
+			if not f.success then {
+				log "Failed to prepare distributed MemoryStore: AggregatesStore : "+f.status at ERROR;
+				die;
+			}
+			store := storage.open(StoreName);
+			prepareTable(store);
+			log "StorePrepared";
+		}
+	}
+
+
+	/** Prepare tables */
+	action prepareTable(Store store) 
+	{   
+		if DEBUG then {print "StoreName: " + store.getStoreName();}
+		
+		if store.getStoreName() = "AggregatesStore"		
+		
+		then {
+		
+		/** Open the table DefaultRuleOutputDefinitions */
+		Schema schema4 := new Schema;
+		schema4.fields := SCHEMA_NAMES4;
+		schema4.types := SCHEMA_TYPES4;
+		schema4.exposeMemoryView := false;
+		schema4.memoryViewDisplayName := "DefaultRuleOutputDefinitions";
+		
+		Finished f4;
+		on Finished(id = store.prepare(TABLE_NAME4, schema4)):f4
+		{
+			if not f4.success then {
+				log "Failed to prepare distributed MemoryStore table: "+f4.status at ERROR;
+				die;
+			}
+			tblRuleOutputDefinitions := store.open(TABLE_NAME4);
+			if DEBUG then {	 print "tbl4Open"; }			
+			
+			loadRuleOutputDefinitions();
+			
+		}			
+		
+		
+		/** Open the table SSIS_Aggregates */
+		Schema schema := new Schema;
+		schema.fields := SCHEMA_NAMES;
+		schema.types := SCHEMA_TYPES;
+		schema.exposeMemoryView := false;
+		schema.memoryViewDisplayName := "MachineAggregatesData";
+
+		Finished f;
+		on Finished(id = store.prepare(TABLE_NAME, schema)):f 
+		{
+			if not f.success then {
+				log "Failed to prepare distributed MemoryStore table: "+f.status at ERROR;
+				die;
+			}
+			tblSSIS_Aggregates := store.open(TABLE_NAME);
+			
+			}		
+		}
+
+
+		else if store.getStoreName() = "ExcludedEventsStore"	then {
+			
+			/** Open the table Excluded_Events */
+			Schema schemaExcludedEvents := new Schema;
+			schemaExcludedEvents.fields := SCHEMA_NAMES_ExcludedEvents;
+			schemaExcludedEvents.types := SCHEMA_TYPES_ExcludedEvents;
+			schemaExcludedEvents.exposeMemoryView := false;
+			//schema3.exposePersistentView := true;
+			//schemaExcludedEvents.memoryViewDisplayName := "ExcludedEvents";
+			//schema3.persistentViewDisplayName := "EventConclusions";
+
+			Finished f3;
+			on Finished(id = store.prepare(Table_Name_ExcludedEvents, schemaExcludedEvents)):f3 
+			{
+				if not f3.success then {
+					log "Failed to prepare distributed MemoryStore table: "+f3.status at ERROR;
+					die;
+				}
+				tblExcludedEvents := store.open(Table_Name_ExcludedEvents);
+				if DEBUG then {	 print "ExludedEventsTableOpen"; }
+			}	
+			
+			/** Send event to confirm the excludedEventStoreIsOpen*/
+			   StartExcludedEventStore OpenExcludedEventsStore:= StartExcludedEventStore(true);
+				
+				on wait (10.0)				   
+				{route OpenExcludedEventsStore;	
+				}			
+			}
+				
+		else {
+		
+		/** Open the table Event_Conclusions */
+		Schema schema3 := new Schema;
+		schema3.fields := SCHEMA_NAMES3;
+		schema3.types := SCHEMA_TYPES3;
+		schema3.exposeMemoryView := true;
+		//schema3.exposePersistentView := true;
+		schema3.memoryViewDisplayName := "EventConclusions";
+		//schema3.persistentViewDisplayName := "EventConclusions";
+
+		Finished f3;
+		on Finished(id = store.prepare(TABLE_NAME3, schema3)):f3 
+		{
+			if not f3.success then {
+				log "Failed to prepare distributed MemoryStore table: "+f3.status at ERROR;
+				die;
+			}
+			tblEvent_Conclusions := store.open(TABLE_NAME3);
+			cleanMemoryStoreEventConclusions();
+			if DEBUG then {	 print "tbl3Open"; }
+		}
+		
+		
+		/** Start sensorchecks*/
+			StartSensorChecksEvent start:= StartSensorChecksEvent(true);
+			
+			on wait (10.0)
+			   
+			{route start;	
+			
+			if DEBUG then { print "Start Sensorchecks event routed";  }
+			}		
+		}
+		
+	}
+	
+
+	/** Initial Load MasterData */
+	action loadAggregatesData{
+		if DEBUG then {	
+			print "TryConnectingToDatabase";
+			 }
+		log "Loading Aggregates Data";
+		//
+		db.openQuickODBC( "ApamaSQLWriteV2", "MicroStrategy_DEV_RW", "udEze6Re", handleError );
+		if DEBUG then { print "TryReadingQuery"; }
+		
+		/*Only execute when UTCHour = 7*/
+		if ((( currentTime/(3600.0)).floor()%24) = 7 ) then {
+		db.doSQLQuery( "  SELECT concat(CommunicationToken,'#',Registername,'#',NumberOfDays,'#EOL') as AggregateKey 
+		               ,[machineid]
+		               ,[registername]
+		               ,[numberofdays]
+		               ,isnull([aggregate],-99) as [aggregatevalue]
+		               ,isnull(DATEDIFF(s, '1970-01-01 00:00:00', [LatestSensorValueUtcTime]),DATEDIFF(s, '1970-01-01 00:00:00', '1970-01-01 00:00:00')) as [latestsensorutc]
+		               ,isnull([itemcount],-99) as [itemcount]
+		               ,isnull(DATEDIFF(s, '1970-01-01 00:00:00', [updatedon]),DATEDIFF(s, '1970-01-01 00:00:00', '1970-01-01 00:00:00')) as [updatedon]
+		               ,DATEDIFF(s, '1970-01-01 00:00:00', [insertedon]) as [insertedon]
+		               FROM [dbo].[CEP_FACT_Aggregates]  ", handleAggregatesData );	
+		
+	if 	DEBUGMemStoreLoad then {
+	print "Loading aggregates data";	
+	}
+		
+		}
+		
+		db.doSQLQuery( "     SELECT concat(CommunicationToken,'#',EventName,'#',RegisterName,'#EOL') as ExcludedEventKey 
+			              ,isnull([CommunicationToken],'') as [CommunicationToken]
+						   ,isnull([MachineSerialNumber],'') as [MachineSerialNumber]
+						   ,isnull([machineid],'') as [MachineId]
+			               ,isnull([EventName],'') as EventName
+			               ,isnull([RegisterName],'') as RegisterName
+			               ,isnull(DATEDIFF(s, '1970-01-01 00:00:00', [ExpiryDate]),DATEDIFF(s, '1970-01-01 00:00:00', '1970-01-01 00:00:00')) as [ExpiryDate]
+			               ,isnull([DaysToSuppress],-99) as [DaysToSuppress]
+			               ,isnull(DATEDIFF(s, '1970-01-01 00:00:00', [StartDate]),DATEDIFF(s, '1970-01-01 00:00:00', '1970-01-01 00:00:00')) as [StartDate]
+			               FROM [dbo].[vw_CEP_SuppressedMachines]", handleExcludedEventsData );	
+		
+		db.close( false);
+		
+		if 	DEBUGMemStoreLoad then {
+			print "Loading SuppressedEvents data";	
+			}
+	}
+	
+	 action handleAggregatesData( dictionary< string, string > data ) {
+
+		if DEBUG then { print data.toString(); }
+
+		Row r;
+		r:=tblSSIS_Aggregates.get(data[ "aggregatekey"]); //Moet String zijn
+		r.setString("aggregatekey", data[ "aggregatekey" ]);
+		r.setInteger("machineid", data[ "machineid" ].toInteger());
+		r.setString("registername", data[ "registername" ]);
+		r.setInteger("numberofdays", data[ "numberofdays" ].toInteger());
+		r.setFloat("value", data[ "aggregatevalue"].toFloat());
+		r.setInteger("latestsensorutc", data[ "latestsensorutc" ].toInteger());
+		r.setInteger("itemcount", data[ "itemcount" ].toInteger());
+		r.setInteger("updatedon", data[ "updatedon" ].toInteger());
+		r.setInteger("insertedon", data[ "insertedon" ].toInteger());
+		r.commit();
+		
+		integer id := tblSSIS_Aggregates.persist(); 
+		
+		
+	}
+	
+	action handleExcludedEventsData( dictionary< string, string > ExcludedEventsdata ) {
+
+		if DEBUG then { print ExcludedEventsdata.toString(); }
+
+		Row r;
+		r:=tblExcludedEvents.get(ExcludedEventsdata[ "excludedeventkey"]); //Moet String zijn
+		r.setString("ExcludedEventKey", ExcludedEventsdata[ "excludedeventkey" ]);
+		r.setString("CommunicationToken", ExcludedEventsdata[ "communicationtoken" ]);
+		r.setString("MachineSerialNumber", ExcludedEventsdata[ "machineserialnumber" ]);
+		r.setString("MachineId", ExcludedEventsdata[ "machineid" ]);
+		r.setString("EventName", ExcludedEventsdata[ "eventname"]);
+		r.setString("RegisterName", ExcludedEventsdata[ "registername" ]);
+		r.setInteger("ExpiryDate", ExcludedEventsdata[ "expirydate" ].toInteger());
+		r.setInteger("DaysToSuppress", ExcludedEventsdata[ "daystosuppress" ].toInteger());
+		r.setInteger("StartDate", ExcludedEventsdata[ "startdate" ].toInteger());
+		r.commit();
+		
+		integer id := tblExcludedEvents.persist(); 
+		
+		if DEBUG then { print "ExcludedEventsLoaded row committed";  }
+		
+	}
+	
+	/** Initial Load DefaultRuleOutputDefinitions */
+	action loadRuleOutputDefinitions{
+		
+		log "Loading Default Output Definitions";
+				
+		SmartLinkOutputDefinition Definition;
+		
+		on all SmartLinkOutputDefinition():Definition {
+		
+			if DEBUG then { print "Writing definitions to memstore: " + Definition.toString(); }
+			
+			
+		string definitionkey :=  Definition.EventName + "#" +  Definition.RegisterName + "#" + Definition.RuleKey +  "#EOL";
+		
+		Row r;
+		r:=tblRuleOutputDefinitions.get(definitionkey); //Moet String zijn
+		r.setString("definitionkey", definitionkey);
+		r.setString("ruleset", Definition.RuleSet);
+		r.setString("rulekey", Definition.RuleKey);
+		r.setString("checkmatched", Definition.CheckMatched);
+		r.setString("eventname",Definition.EventName);
+		r.setString("checkregister", Definition.CheckRegister);
+		r.setString("registername", Definition.RegisterName);
+		r.setString("registerdescription", Definition.RegisterDescription);
+		r.setString("outputlevel1", Definition.OutputLevel1);
+		r.setString("outputlevel2", Definition.OutputLevel2);
+		r.setString("basiceventinfo", Definition.BasicEventInfo);
+		r.setString("eventinfo", Definition.EventInfo);
+		r.setString("ruleversion", Definition.RuleVersion);
+		r.commit();
+		
+		integer id := tblRuleOutputDefinitions.persist(); 
+				
+		}
+	}
+  
+
+	action cleanMemoryStoreEventConclusions() {
+
+		if DEBUG then {			
+			print "MemstoreCleaning started";			
+		}
+
+		on all wait (3600.0) {
+			//on all triggerCodeEvent(){ /*for debugging purposes*/
+
+			if DEBUG then {
+
+				print "MemstoreCleaning: event received";
+
+			}			
+			Iterator i := tblEvent_Conclusions.begin();
+			while not i.done() {
+				Row r  := i.getRow();
+				boolean done := false;
+				while r.inTable() and not done {
+
+					if (currentTime - r.getInteger("insertedon").toFloat()) > 86400.0 * 1.0  then { /*one day*/
+						//if DEBUG then { print "Row to remove: " + r.getInteger("insertedon").toString();}
+						r.remove();
+						done := r.tryCommitOrUpdate();
+						//if DEBUG then { print "Tried to remove row: succeeded = " + done.toString();}
+
+					}
+					else { done := true;				   
+					}
+				}
+				i.step();
+			}	
+			integer id := tblEvent_Conclusions.persist();
+		}
+	}
+	
+}
+
+
+/*action cleanMemoryStoreEventSensorVals() {
+
+if DEBUG then {			
+	print "MemstoreCleaning started";			
+}
+
+on all wait (3600.0) {
+	//on all triggerCodeEvent(){ /*for debugging purposes*/
+
+/*	if DEBUG then {
+
+		print "MemstoreCleaning: event received";
+
+	}			
+	Iterator i := tblEvent_SensorValues.begin();
+	while not i.done() {
+		Row r  := i.getRow();
+		boolean done := false;
+		while r.inTable() and not done {
+
+			if DEBUG then { print "intable";}
+
+			if (currentTime - r.getInteger("insertedon").toFloat()) > 3600.0   then { /*remove after one hour*/
+
+		/*		r.remove();
+				done := r.tryCommitOrUpdate();	
+				
+										
+				if DEBUG then { print "true";}
+
+			}
+			else { done := true;				   
+			if DEBUG then { print "false";}
+			}
+		}
+		i.step();
+	}		
+}
+
+integer id := tblEvent_SensorValues.persist();
+
+}*/

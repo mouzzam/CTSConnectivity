@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	$Copyright (c) 2011 Progress Software Corporation. All rights reserved. $
+	$Copyright (c) 2013 Software AG, Darmstadt, Germany and/or Software AG USA Inc., Reston, VA, USA, and/or its Subsidiaries and or/its Affiliates and/or their licensors.$
+	Use, reproduction, transfer, publication or disclosure is prohibited except as specifically provided for in your License Agreement with Software AG
+-->
+<mappingInfo xmlns="urn:mappinginfo" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <generateServiceMon>true</generateServiceMon>
+  <parameters>
+    <parameterMap type="evt-options">
+      <param name="autoStartEvents" value="true"/>
+    </parameterMap>
+  </parameters>
+  <events/>
+  <dbs/>
+</mappingInfo>

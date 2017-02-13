@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<comment>Created : Thu Oct 27 16:34:25 CEST 2016</comment>
+<entry key="apama.rtv.usePanel">false</entry>
+<entry key="apama.rtv.main">EventDashboardPre25102016.rtv</entry>
+<entry key="apama.rtv.name">CTSConnectivityV2</entry>
+</properties>

@@ -1,0 +1,21 @@
+//*****************************************************************************
+// Title:         Checkmachinestate
+// Description:   Checkmachinestate description
+// Dependencies:  None
+// Author:        AIR15581
+//
+//*****************************************************************************
+
+package com.atlascopco.ctsconnectivity;
+
+monitor CheckMachineState {
+	
+	action onload() {		
+		
+		SMARTLINKCompressorState MachineState;
+
+		on all SMARTLINKCompressorState():MachineState {
+				print "MachineState - " +  MachineState.toString();
+		}			
+	}	
+}

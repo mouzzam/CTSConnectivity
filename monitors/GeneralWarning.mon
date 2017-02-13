@@ -1,0 +1,65 @@
+//*****************************************************************************
+// Title:         GeneralWarning
+// Description:   GeneralWarning description
+// Dependencies:  None
+// Author:        AIR15396
+//
+//*****************************************************************************
+
+package com.atlascopco.ctsconnectivity;
+
+// TODO: Monitors and event definitions here
+
+persistent monitor GeneralWarning {
+	
+	boolean DEBUG := false;
+
+	action onload() {				
+		// Simple rules
+		
+		SmartLinkRuleEvent PreServiceWarning;
+
+	
+		SmartLinkRuleEvent Warning;
+		
+		on all SmartLinkRuleEvent(EventName="GeneralWarning"):Warning {
+			spawn GeneralWarning(Warning);
+			
+			if DEBUG then {
+				
+				print  "NEW Warning_SmartlinkRuleEvent" + Warning.toString();
+			}
+			
+			
+		}		
+	}
+	
+	action GeneralWarning(SmartLinkRuleEvent GeneralWarning) {
+		
+		/** Warning logic
+		* Check for clear event/bit for 7 minutes
+		* If no clear => check for repeating (period depends on originator)
+		* If not repeating => check sensors for cause (depends on originator)
+		* A lot of servicewarning are operational/marketing related so output = NA - 4 => not relevant for monitoring room
+		*/
+		
+ 		string EventKey := GeneralWarning.CommunicationToken + "#" + GeneralWarning.EventName + "#" + GeneralWarning.UtcTime.toString() + "#" + GeneralWarning.RegisterName + "EOL";
+
+		
+			on SmartLinkRuleEvent(EventName="GeneralWarningCleared", CommunicationToken=GeneralWarning.CommunicationToken) within(420.0) {
+
+					route SmartLinkOutputEvent(GeneralWarning,
+					                           GeneralWarning.DelayLevel1,
+					                           GeneralWarning.DelayLevel2,
+					                           false,
+					                           GeneralWarning.EventInfo7Minutes,
+					                           currentTime,
+					                           EventKey);
+				die;				
+			}
+			
+			on wait(420.0) and not SmartLinkRuleEvent(EventName="GeneralWarningCleared", CommunicationToken=GeneralWarning.CommunicationToken) {	
+				route SmartLinkRepeatCheck(GeneralWarning); 
+			}
+	}
+}

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mapping>
+  <event direction="upstream" encoder="none" name="invalid">
+    <id-rules>
+      <upstream/>
+    </id-rules>
+    <mapping-rules/>
+  </event>
+</mapping>

@@ -1,0 +1,123 @@
+//*****************************************************************************
+// Title:         ManagementDashboard
+// Description:   ManagementDashboard description
+// Dependencies:  None
+// Author:        AIR15581
+//
+//*****************************************************************************
+package com.atlascopco.ctsconnectivity;
+using com.apama.aggregates.sum;
+using com.apama.aggregates.count;
+using com.apama.memorystore.Storage;
+using com.apama.memorystore.Store;
+using com.apama.memorystore.Table;
+using com.apama.memorystore.Schema;
+using com.apama.memorystore.Iterator;
+using com.apama.memorystore.Finished;
+using com.apama.memorystore.Row;
+using com.apama.memorystore.RowChanged;
+
+monitor ManagementDashboard {
+	
+	import "TimeFormatPlugin" as timeMgr;
+	
+	constant string STORE_NAME := "AppMonitor";
+	constant string TABLE_NAME_RunningAggr := "RunningAggr";
+	
+	sequence<string> SCHEMA_NAMES_Running := ["Type", "Counter","Last24H"];
+	sequence<string> SCHEMA_TYPES_Running := ["string","integer","float"];
+	
+	
+	Storage storage;
+	Table tblRunningAggr;
+	
+	
+	action onload() {			
+		log "ManagementDashboard Onload()" at INFO;
+
+		prepareStore();
+	}
+	
+	
+	action prepareStore() 
+	{
+		log "ManagementDashboard StartPrepareSTore()" at INFO;
+
+		Finished f;
+		on Finished(id = storage.prepareOrCreate(STORE_NAME,"SystemMonitor.store")):f 
+		{
+			if not f.success then {
+				log "Failed to prepare distributed MemoryStore: "+f.status at ERROR;
+				die;
+			}
+			Store store := storage.open(STORE_NAME);
+			prepareTable(store);
+		}
+	}
+
+	/** Open the table. */
+	action prepareTable(Store store) 
+	{
+		
+		log "SystemMonitor StartPrepareTable()" at INFO;
+			
+			Schema schemarunning := new Schema;
+			schemarunning.fields := SCHEMA_NAMES_Running;
+			schemarunning.types := SCHEMA_TYPES_Running;
+			schemarunning.exposeMemoryView := true;
+			schemarunning.memoryViewDisplayName := "RunningAggr";
+			
+			Finished fRunning;
+			on Finished(id = store.prepare(TABLE_NAME_RunningAggr, schemarunning)):fRunning 
+			{
+				if not fRunning.success then {
+					log "Failed to prepare distributed MemoryStore table: "+fRunning.status at ERROR;
+					die;
+				}
+				tblRunningAggr := store.open(TABLE_NAME_RunningAggr);
+			
+			StartStreams();
+			}
+		}	
+
+	
+	action StartStreams {
+		
+		log "SystemMonitor StartStreams()" at INFO;
+		
+			stream<integer> CountRunningSensorData := 
+				from s in all SMARTLINKSensorData()
+				within 60.0 every 1.0
+				  select count();
+
+				stream<integer> CountRunningMachineStatusData := 
+					from s in all SmartLinkDashboardMachineStatus()
+					within 60.0 every 1.0
+					  select count();
+				
+					
+					stream<integer> CountRunningEventData :=
+						from e in all SmartLinkRuleEvent()
+						within 60.0 every 1.0
+						  select count();
+					
+					integer countRunningSensors;
+					integer countRunningEvents;
+					integer countRunningStates;
+					
+					from CountRunningSensorData:countRunningSensors WriteRunningAggr("Sensors", countRunningSensors) ;
+					from CountRunningEventData:countRunningEvents WriteRunningAggr("Events",countRunningEvents);
+					from CountRunningMachineStatusData:countRunningStates WriteRunningAggr("States",countRunningStates);
+					
+				}
+	
+	action WriteRunningAggr(string Type, integer Counter) {
+		Row r;
+		r:= tblRunningAggr.get(Type);
+		r.setString("Type", Type);
+		r.setInteger("Counter", Counter);
+		r.setFloat("Last24H",currentTime-86400.0);
+		r.commit();		
+		integer id := tblRunningAggr.persist(); 
+	}
+}

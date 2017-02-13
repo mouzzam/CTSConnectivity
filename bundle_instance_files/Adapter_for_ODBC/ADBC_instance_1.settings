@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	$Copyright (c) 2011 Progress Software Corporation. All rights reserved. $
+	$Copyright (c) 2013 Software AG, Darmstadt, Germany and/or Software AG USA Inc., Reston, VA, USA, and/or its Subsidiaries and or/its Affiliates and/or their licensors.$
+	Use, reproduction, transfer, publication or disclosure is prohibited except as specifically provided for in your License Agreement with Software AG
+-->
+<mappingInfo xmlns="urn:mappinginfo" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <generateServiceMon>true</generateServiceMon>
+  <parameters>
+    <parameterMap type="evt-options">
+      <param name="autoStartEvents" value="true"/>
+    </parameterMap>
+  </parameters>
+  <events>
+    <event name="SmartLinkEventDb" package="com.atlascopco.ctsconnectivity" type="EVENT">
+      <table name="CEP_FACT_Events" url="ApamaSQLWriteV2"/>
+      <properties>
+        <property name="time" type="float" value="InsertedOn"/>
+        <property name="USER_NAME" type="HIDDEN" value="MicroStrategy_DEV_RW"/>
+        <property name="PASSWORD" type="HIDDEN" value="udEze6Re"/>
+      </properties>
+    </event>
+    <event name="OutputConclusionToDatabase" package="com.atlascopco.ctsconnectivity" type="EVENT">
+      <table name="CEP_FACT_Conclusions" url="ApamaSQLWriteV2"/>
+      <properties>
+        <property name="time" type="float" value="insertedon"/>
+        <property name="USER_NAME" type="HIDDEN" value="microstrategy_dev_rw"/>
+        <property name="PASSWORD" type="HIDDEN" value="udEze6Re"/>
+      </properties>
+    </event>
+  </events>
+  <dbs>
+    <db url="ApamaSQLWriteV2">
+      <tabledescriptions>
+        <tabledescription name="CEP_FACT_Events">
+          <fields>
+            <field name="EventKey" type="varchar"/>
+            <field name="CommunicationToken" type="varchar"/>
+            <field name="EventName" type="varchar"/>
+            <field name="RegisterName" type="varchar"/>
+            <field name="RegisterDescription" type="varchar"/>
+            <field name="SensorValue" type="float"/>
+            <field name="UtcTime" type="float"/>
+            <field name="LocalTime" type="float"/>
+            <field name="Level1" type="varchar"/>
+            <field name="Level2" type="varchar"/>
+            <field name="EventInfo" type="varchar"/>
+            <field name="AssignedTo" type="varchar"/>
+            <field name="Customer" type="varchar"/>
+            <field name="InsertedOn" type="float"/>
+          </fields>
+        </tabledescription>
+        <tabledescription name="CEP_FACT_Conclusions">
+          <fields>
+            <field name="EventKey" type="varchar"/>
+            <field name="CommunicationToken" type="varchar"/>
+            <field name="RuleKey" type="varchar"/>
+            <field name="Type" type="varchar"/>
+            <field name="Conclusion" type="varchar"/>
+            <field name="CheckMatched" type="varchar"/>
+            <field name="Level1" type="varchar"/>
+            <field name="Level2" type="varchar"/>
+            <field name="EventInfo" type="varchar"/>
+            <field name="GeneralCheck" type="varchar"/>
+            <field name="DezideId1" type="varchar"/>
+            <field name="DezideId2" type="varchar"/>
+            <field name="insertedon" type="float"/>
+          </fields>
+        </tabledescription>
+      </tabledescriptions>
+    </db>
+  </dbs>
+</mappingInfo>

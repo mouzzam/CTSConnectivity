@@ -1,0 +1,390 @@
+//*****************************************************************************
+// Title:         CTSConnectivityEvents
+// Description:   CTSConnectivityEvents description
+// Dependencies:  None
+// Author:        air15581
+//
+//*****************************************************************************
+
+package com.atlascopco.ctsconnectivity;
+
+/** Machine MasterData */
+
+event SmartLinkMachineMasterData {
+	string CommunicationToken;
+	string Model;
+	integer MachineTypeId;
+	string SuperVisionFlag;
+	string Timezone;
+	integer LocalTimeDifference;
+	string M2MStableMode;
+	string SmartBoxFlag;
+	string UploadType;
+	string ModelPrefix;
+}
+
+/** Event Rules - Check Excel */
+
+event SmartLinkRuleOutputDefinition {
+	string RuleSet;
+	string EventName;
+	string CheckRegister;
+	string RegisterName;
+	string RegisterDescription;
+	string Delay;
+	string Repeated;
+	string RepeatTimeHours;
+	string SensorCheck;
+	string DefaultOutputLevel1;
+	string DefaultOutputLevel2;
+	string DefaultEventInfo;
+	string DelayLevel1;
+	string DelayLevel2;
+	string EventInfo7Minutes;
+	string RepeatedOutputLevel1;
+	string RepeatedOutputLevel2;
+	string EventInfoRepeat;
+	string RuleVersion;
+}
+
+
+/** M2M Events from IBM MQ using .net client */
+                 /**  SMARTLINKEvents - Warning / ShutdownWarning / Shutdown */
+
+                 event SMARTLINKEvent{
+                 	integer messageId;
+                 	string EventName;
+                 	string CommunicationToken;
+                 	integer UtcTime;
+                 	string RegisterName;
+                 	string Sensorvalue;
+                 	dictionary<string,string> ArraySensorsReading;
+                 	dictionary<string,string> ArrayRelatedSensorsReading;
+                 	integer ReceivedUtcTime;
+                 	}
+
+                 /** SMARTLINKSensorData */
+
+                 event SMARTLINKSensorData{
+                 	integer messageId;
+                 	string CommunicationToken;
+                 	string RegisterName;
+                 	integer UtcTime;
+                 	float NumericValue;
+                 	string TextValue;
+                 	integer ReceivedUtcTime;
+                 	}
+
+                 /** SMARTLINKMachineState */
+
+                 event SMARTLINKCompressorState{
+                 	integer messageId;
+                 	string CommunicationToken;
+                 	integer UtcTime;
+                 	integer MachineType;
+                 	string ValueRegister2500;
+                 	string ValueRegister2501;
+                 	string MachineState;
+                 	string IntegratedState;
+                 	integer ServiceState;
+                 	integer PreServiceWarningRHState;
+                 	integer PreServiceWarningAccVolState;
+                 	integer PreServiceWarningAnalogInputState;
+                 	integer ShutdownState;
+                 	integer EmergencyStopState;
+                 	integer GeneralWarningState;
+                 	integer GeneralShutdownWarningState;
+                 	integer GeneralStartFailureState;
+                 	integer InternalDryerShutdownState;
+                 	integer ReceivedUtcTime;
+                 }
+
+
+                 /** SMARTLINKAirnetState */
+
+                 event SMARTLINKAirnetState{
+                 	integer messageId;
+                 	string CommunicationToken;
+                 	integer UtcTime;
+                 	integer MachineType;
+                 	string ValueRegister4900;
+                 	string ValueRegister4901;
+                 	string MachineState;
+                 	integer PressureDeviationShutdownState;
+                 	integer PressureDeviationWarningState;
+                 	integer HighPressureShutdownState;
+                 	integer HighPressureWarningState;
+                 	integer LowPressureShutdownState;
+                 	integer LowPressureWarningState;
+                 	integer ReceivedUtcTime;
+                 }
+
+                 /** SMARTLINKDryerState */
+
+                 event SMARTLINKDryerState{
+                 	integer messageId;
+                 	string CommunicationToken;
+                 	integer UtcTime;
+                 	integer MachineType;
+                 	string ValueRegister2500;
+                 	string ValueRegister2501;
+                 	string MachineState;
+                 	string IntegratedState;
+                 	integer ServiceState;
+                 	integer PreServiceWarningRHState;
+                 	integer PreServiceWarningAccVolState;
+                 	integer PreServiceWarningAnalogInputState;
+                 	integer ShutdownState;
+                 	integer EmergencyStopState;
+                 	integer GeneralWarningState;
+                 	integer GeneralShutdownWarningState;
+                 	integer GeneralStartFailureState;
+                 	integer ReceivedUtcTime;
+                 }
+
+                 /** SMARTLINK Response */
+
+                 event SMARTLINKResponse {
+                 	integer messageId;
+                 	string Status;
+                 }
+
+                 /** Output Event towards the other correlators */
+
+                 event SmartLinkRuleEvent{
+                 	string EventName;
+                 	string RegisterName;
+                  	string Sensorvalue;
+                  	dictionary<string,string> ArraySensorsReading;
+                  	dictionary<string,string> ArrayRelatedSensorsReading;
+                 	integer UtcTime;
+                 	integer ReceivedTime;
+                 	integer LocalTime;
+                 	string CommunicationToken;
+                 	string Model;
+                 	integer MachineTypeId;
+                 	string SuperVisionFlag;
+                 	string Timezone;
+                 	integer LocalTimeDifference;
+                 	string M2MStableMode;
+                 	string SmartBoxFlag;
+                 	string UploadType;
+                 	string ModelPrefix;
+                 	string RuleSet;
+                 	string CheckRegister;
+                 	string Delay;
+                 	string Repeated;
+                 	string RepeatTimeHours;
+                 	string SensorCheck;
+                 	string DefaultOutputLevel1;
+                 	string DefaultOutputLevel2;
+                 	string DefaultEventInfo;
+                 	string DelayLevel1;
+                 	string DelayLevel2;
+                 	string EventInfo7Minutes;
+                 	string RepeatedOutputLevel1;
+                 	string RepeatedOutputLevel2;
+                 	string EventInfoRepeat;
+                 	string RuleVersion;
+                 	}
+
+/** Output toward SensorChecks */
+event SmartLinkRepeatCheck{
+	SmartLinkRuleEvent SmartLinkEvent;
+	}
+
+/** Output toward SensorChecks */
+event SmartLinkSensorCheck{
+	SmartLinkRuleEvent SmartLinkEvent;
+	string Level1;
+	string Level2;
+	string EventInfo;
+	}
+
+/** Output toward Output Monitor */
+
+event SmartLinkOutputEvent{
+	SmartLinkRuleEvent SmartLinkEvent;
+	string Level1;
+	string Level2;
+	boolean Level3;
+	string EventInfo;
+	float UtcTime;
+	string EventKey;
+	}
+
+event SmartLinkDashboardMachineStatus{
+	SMARTLINKCompressorState MachineStatus;
+	}
+
+event SmartLinkDashboardEvent {
+	SmartLinkRuleEvent SmartLinkEvent;
+	string Level1;
+	string Level2;
+	string EventInfo;
+	string Customer;
+	string Planner;
+	float UtcTime;
+	string TicketStatus;
+	string EventKey;
+	}
+
+event SmartLinkRegisterConverter {
+	string RegisterName;
+	string RegisterDescription;
+	integer QuantityId;
+	string QuantityName;
+	string SISymbol;
+	float MetricScale;
+	float MetricOffset;
+	string MetricSymbol;
+	float ImperialScale;
+	float ImperialOffset;
+	string ImperialSymbol;
+}
+
+event SmartLinkEventDb {
+	string EventKey;
+	string CommunicationToken;
+	string EventName;
+	string RegisterName;
+	string RegisterDescription;
+	float Sensorvalue;
+	float UtcTime;
+	float LocalTime;
+	string Level1;
+	string Level2;
+	string EventInfo;
+	string AssignedTo;
+	string Customer;
+	float InsertedOn;
+}
+
+event SmartLinkTicket {
+	string TicketKey;
+	string EventKey;
+	string TicketStatus;
+	string ExternalComment;	
+	string ServiceOrderNumber;
+	string CEPAgreeDisagree;
+	float InsertedTicketUtcTime;
+	float UpdatedTicketUtcTime;
+}
+
+event SmartLinkTicketComment {
+	string TicketCommentKey;
+	string TicketKey;
+	string TicketStatus;
+	string InternalComment;
+	float InsertedCommentUtcTime;
+	string InsertedBy;
+}
+
+event SmartLinkTicketStatusUpdate {
+	string MachineEventHistoryId;
+	string TicketStatus;
+	string EventKey;
+}
+
+
+/** SmartlinkSensorCheck enriched with key */
+event SmartLinkSensorCheckKey{
+	string EventKey;
+	SmartLinkRuleEvent SmartLinkEvent;
+	string Level1;
+	string Level2;
+	string EventInfo;
+	}
+
+
+event RequestedAggregate{
+	string AggregateKey;
+    string registername;
+    integer numberofdays;
+    float aggregatevalue;
+    integer latestsensorutc;
+    integer itemcount;
+    integer updatedon;
+    integer insertedon;
+
+}
+
+/**New events 03/02/2015*/
+
+
+event SmartLinkOutputDefinition{
+	string RuleSet;
+	string RuleKey;
+	string CheckMatched;
+	string EventName;	
+	string CheckRegister;
+	string RegisterName;
+	string RegisterDescription;
+	string OutputLevel1;
+	string OutputLevel2;
+	string BasicEventInfo;
+	string EventInfo;
+	string RuleVersion;	
+}
+
+event SmartLinkGeneralRuleOutputDefinition{	
+	string RuleSet;
+	string EventName;
+	string Delay;
+	string Repeated;
+	string RepeatTimeHours;
+	string RuleVersion;
+}
+
+event StartSensorChecksEvent {
+	
+boolean start;
+}
+
+event checkResult {
+	string EventKey;
+	string CommunicationToken;
+	string RuleKey;
+	string CheckMatched;
+	string Type;
+	string Conclusion;
+	string level1;
+	string level2;
+	string EventInfo;
+	boolean GeneralCheck;
+	boolean OutputToDatabaseAndDashboard;
+	boolean SensorCheck;
+}
+
+/*06/07/2015*/
+
+event cleanSensorValueDictionary {
+	string EventKey;
+}
+
+/*22/09/2015*/
+event outgoingEventsCounterEvent{
+	
+	integer AddOne;
+	
+}
+
+/*29/09/2015*/
+event SmartLinkConverterMasterData{
+integer CategoryId;
+string ConverterType;
+integer ConverterId;	
+}
+
+event SmartLinkConverterFaultCode{
+	integer ConverterId;
+	integer VSDFaultCode;
+	integer ACFaultCode;	
+	integer ArticleId;
+	}
+
+
+
+
+
+

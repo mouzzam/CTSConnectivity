@@ -1,0 +1,142 @@
+//*****************************************************************************
+// Title:         GeneralShutDownWarning
+// Description:   GeneralShutDownWarning description
+// Dependencies:  None
+// Author:        AIR15581
+//
+//*****************************************************************************
+
+package com.atlascopco.ctsconnectivity;
+
+// TODO: Monitors and event definitions here
+
+persistent monitor RepeatCheck {
+	
+	dictionary<string,sequence<string> > RepeatDic :={};
+	
+	boolean DEBUG := false;
+	
+
+	action onload() {				
+		// Simple rules
+	
+		SmartLinkRepeatCheck RepeatCheckEvent;
+		
+		on all SmartLinkRepeatCheck():RepeatCheckEvent {
+			
+			string key := RepeatCheckEvent.SmartLinkEvent.CommunicationToken+ "#" + RepeatCheckEvent.SmartLinkEvent.RegisterName +  "#" + RepeatCheckEvent.SmartLinkEvent.EventName;
+			
+			string EventKey := RepeatCheckEvent.SmartLinkEvent.CommunicationToken + "#" + RepeatCheckEvent.SmartLinkEvent.EventName + "#" + RepeatCheckEvent.SmartLinkEvent.UtcTime.toString() + "#" + RepeatCheckEvent.SmartLinkEvent.RegisterName + "EOL";
+
+
+			log "Repeat - " + RepeatCheckEvent.toString() at INFO;
+			
+			if not RepeatDic.hasKey(key) then
+			{
+				
+				sequence<string> row := [];
+				row.append(RepeatCheckEvent.SmartLinkEvent.UtcTime.toString());
+				row.append(RepeatCheckEvent.SmartLinkEvent.CommunicationToken);				
+				RepeatDic.add(key,row);
+				
+				Output(RepeatCheckEvent);
+				
+				log "Not in Dic  - " + RepeatDic.toString() at INFO;
+	
+			}
+			else
+			{
+				integer t;
+				string pt;
+				integer d;	
+				
+				pt := RepeatDic.getOrDefault(key)[0];
+				
+				t := RepeatCheckEvent.SmartLinkEvent.UtcTime - pt.toInteger();  
+	
+				d := RepeatCheckEvent.SmartLinkEvent.RepeatTimeHours.toInteger()*60*60;
+				//Every non shutdown event is flagged as repeating when occurring again in 24 hours. Reset when Shutdown comes in.
+				
+				if t < d then {
+					route SmartLinkOutputEvent(RepeatCheckEvent.SmartLinkEvent,
+					                           RepeatCheckEvent.SmartLinkEvent.RepeatedOutputLevel1,
+					                           RepeatCheckEvent.SmartLinkEvent.RepeatedOutputLevel2,
+					                           false,
+					                           RepeatCheckEvent.SmartLinkEvent.EventInfoRepeat,
+					                           currentTime,
+					                           EventKey);
+					
+					log "Repeat Dic - " + RepeatDic.toString() at INFO;
+				}
+				else
+				{				
+					Output(RepeatCheckEvent);
+					
+					sequence<string> row := [];				
+					row.append(RepeatCheckEvent.SmartLinkEvent.UtcTime.toString());
+					row.append(RepeatCheckEvent.SmartLinkEvent.CommunicationToken);
+					RepeatDic.add(key, row );		
+					
+					log "Treshold Repeat Dic - " + RepeatDic.toString() at INFO;
+				} 
+			} 	
+		}
+		
+		// Remove machine due to shutdown => trigger output instead of repeated message
+		
+		SmartLinkRuleEvent GeneralShutdown;
+
+		on all SmartLinkRuleEvent(EventName="GeneralShutdown"):GeneralShutdown  {
+			
+			string k; 
+			for k in RepeatDic.keys() { 
+				
+				if RepeatDic.getOrDefault(k)[1] = GeneralShutdown.CommunicationToken then
+				{
+					RepeatDic.remove(k);				
+				}
+			}
+		}
+		
+	}
+	
+	action Output(SmartLinkRepeatCheck OutputEvent) {
+		
+		string EventKey := OutputEvent.SmartLinkEvent.CommunicationToken + "#" + OutputEvent.SmartLinkEvent.EventName + "#" + OutputEvent.SmartLinkEvent.UtcTime.toString() + "#" + OutputEvent.SmartLinkEvent.RegisterName + "EOL";
+		
+		if OutputEvent.SmartLinkEvent.SensorCheck = "Y" then
+		{
+			route SmartLinkSensorCheck(OutputEvent.SmartLinkEvent,
+			                           OutputEvent.SmartLinkEvent.DefaultOutputLevel1,
+			                           OutputEvent.SmartLinkEvent.DefaultOutputLevel2,
+			                           OutputEvent.SmartLinkEvent.DefaultEventInfo);
+			
+			if DEBUG then {
+				
+				print "############ Check Repeat Output SensorCheck = 'Y' " + OutputEvent.toString();
+				
+			}
+			
+			
+			
+		}
+		else
+		{
+			route SmartLinkOutputEvent(OutputEvent.SmartLinkEvent,
+			                           OutputEvent.SmartLinkEvent.DefaultOutputLevel1,
+			                           OutputEvent.SmartLinkEvent.DefaultOutputLevel2,
+			                           false,
+			                           OutputEvent.SmartLinkEvent.DefaultEventInfo,
+			                           currentTime,
+			                           EventKey);	
+			
+			if DEBUG then {
+				
+				print "############ Check Repeat Output SensorCheck = 'N' " + OutputEvent.toString();
+				
+			}
+						
+		}
+		
+	}
+}

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+	$Copyright (c) 2009, 2011-2012 Progress Software Corporation. All rights reserved. $
+	$Copyright (c) 2013 Software AG, Darmstadt, Germany and/or Software AG USA Inc., Reston, VA, USA, and/or its Subsidiaries and or/its Affiliates and/or their licensors.$
+	Use, reproduction, transfer, publication or disclosure is prohibited except as specifically provided for in your License Agreement with Software AG
+--><adapter-config xmlns:xi="http://www.w3.org/2001/XInclude">
+
+	<logging level="INFO"/>	<!-- Log level for the IAF itself -->
+	<plugin-logging level="INFO"/>	<!-- Log level for ADBC adapter -->
+
+	<transports>
+	<transport library="ADBCTransport" name="ADBC-ODBC_@ADAPTER_INSTANCE_ID@">
+    <property name="DataSource" value="ODBC"/>
+    <property name="DatabaseURL" value="@DATABASE_LOCATION@"/>
+    <property name="AdditionalLibrary" value="ADBC-ODBC.dll"/>
+    <property name="StoreBatchSize" value="100"/>
+    <property name="StoreCommitInterval" value="0.0"/>
+    <property name="AutoCommit" value="false"/>
+    <property name="TransactionIsolationLevel" value="Default"/>
+    <property name="AlternateDiscoveryQuery" value=""/>
+    <property name="ColumnNameCase" value="lower"/>
+    <property name="NumericSeparatorLocale" value=""/>
+    <property name="CloseDatabaseIfDisconnected" value="false"/>
+    <property name="FixedSizeInsertBuffers" value="true"/>
+    <property name="FlowControlHighWater" value="15000"/>
+    <property name="FlowControlLowWater" value="6000"/>
+    <property name="QueryTemplateConfigFile" value="@PROJECT_DIR@/@ADAPTER_CONFIG_DIR@/ADBC-queryTemplates-SQL.xml"/>
+    <property name="LogInboundEvents" value="false"/>
+    <property name="LogOutboundEvents" value="false"/>
+    <property name="LogCommands" value="true"/>
+    <property name="LogQueries" value="true"/>
+  </transport>
+	</transports>
+
+	<!-- Codecs -->
+	<codecs>
+		<xi:include href="ADBC-static-codecs.xml" xpointer="xpointer(//codec)"/>
+	</codecs>
+	
+	<!-- Event mappings -->
+	<mapping>
+		<xi:include href="ADBC-static.xml" xpointer="xpointer(//event)"/>
+		<xi:include href="ADBC-static.xml" xpointer="xpointer(//unmapped)"/>
+		<xi:include href="ADBC-application.xml" xpointer="xpointer(//event)"/>
+		<xi:include href="@MAPPING_INSTANCE_FILE@" xpointer="xpointer(//event)">
+    			<xi:fallback/>
+		</xi:include>
+	</mapping>
+
+	<apama>
+		<sinks>
+			<sink host="@CORRELATOR_HOST@" port="@CORRELATOR_PORT@"/>
+		</sinks>
+		<sources>
+			<source host="@CORRELATOR_HOST@" port="@CORRELATOR_PORT@" channels="com.apama.adbc,com.apama.adbc.ODBC_@ADAPTER_INSTANCE_ID@"/>
+		</sources>
+	</apama>
+
+</adapter-config>

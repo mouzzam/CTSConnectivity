@@ -1,0 +1,106 @@
+//*****************************************************************************
+// Title:         ServiceWarning
+// Description:   ServiceWarning description
+// Dependencies:  None
+// Author:        AIR15581
+//
+//*****************************************************************************
+
+package com.atlascopco.ctsconnectivity;
+
+// TODO: Monitors and event definitions here
+
+persistent monitor ServiceWarning {
+
+	dictionary<string,sequence<integer> > ServiceWarningDic :={};
+
+	action onload() {			
+		// Simple rules
+		
+		SmartLinkRuleEvent PreServiceWarning;
+		SmartLinkRuleEvent AirConnectPreServiceWarningLow;
+		SmartLinkRuleEvent AirConnectPreServiceWarningHigh;
+		
+		on all SmartLinkRuleEvent(EventName="AirConnectPreServiceWarningHigh"):AirConnectPreServiceWarningHigh {
+			
+			
+			string EventKey := AirConnectPreServiceWarningHigh.CommunicationToken + "#" + AirConnectPreServiceWarningHigh.EventName + "#" + AirConnectPreServiceWarningHigh.UtcTime.toString() + "#" + AirConnectPreServiceWarningHigh.RegisterName + "EOL";
+
+			
+				route SmartLinkOutputEvent(AirConnectPreServiceWarningHigh,
+				                           AirConnectPreServiceWarningHigh.DefaultOutputLevel1,
+				                           AirConnectPreServiceWarningHigh.DefaultOutputLevel2,
+				                           false,
+				                           AirConnectPreServiceWarningHigh.DefaultEventInfo,
+				                           currentTime,
+				                           EventKey);
+		}
+		
+		on all SmartLinkRuleEvent(EventName="AirConnectPreServiceWarningLow"):AirConnectPreServiceWarningLow {
+			
+			string EventKey := AirConnectPreServiceWarningLow.CommunicationToken + "#" + AirConnectPreServiceWarningLow.EventName + "#" + AirConnectPreServiceWarningLow.UtcTime.toString() + "#" + AirConnectPreServiceWarningLow.RegisterName + "EOL";
+
+
+			route SmartLinkOutputEvent(AirConnectPreServiceWarningLow,
+			                           AirConnectPreServiceWarningLow.DefaultOutputLevel1,
+			                           AirConnectPreServiceWarningLow.DefaultOutputLevel2,
+			                           false,
+			                           AirConnectPreServiceWarningLow.DefaultEventInfo,
+			                           currentTime,
+			                           EventKey);
+		}
+		
+		
+		on all SmartLinkRuleEvent(EventName="PreServiceWarning"):PreServiceWarning {
+			
+			string EventKey := PreServiceWarning.CommunicationToken + "#" + PreServiceWarning.EventName + "#" + PreServiceWarning.UtcTime.toString() + "#" + PreServiceWarning.RegisterName + "EOL";
+
+
+			route SmartLinkOutputEvent(PreServiceWarning,
+			                           PreServiceWarning.DefaultOutputLevel1,
+			                           PreServiceWarning.DefaultOutputLevel2,
+			                           false,
+			                           PreServiceWarning.DefaultEventInfo,
+			                           currentTime,
+			                           EventKey);
+		}
+	
+		SmartLinkRuleEvent GeneralServiceWarning;
+		
+		on all SmartLinkRuleEvent(EventName="GeneralServiceWarning"):GeneralServiceWarning {
+			spawn ServiceWarning(GeneralServiceWarning);
+		}
+		
+	}
+	
+	action ServiceWarning(SmartLinkRuleEvent ServiceWarning) {
+		
+		/** ServiceWarning logic
+		* Check for clear event/bit for 7 minutes
+		* If no clear => check for repeating (period depends on originator)
+		* If not repeating => check sensors for cause (depends on originator)
+		* A lot of servicewarning are operational/marketing related so output = NA - 4 => not relevant for monitoring room
+		*/
+		
+			integer t;
+
+			string EventKey := ServiceWarning.CommunicationToken + "#" + ServiceWarning.EventName + "#" + ServiceWarning.UtcTime.toString() + "#" + ServiceWarning.RegisterName + "EOL";
+
+			
+			on SmartLinkRuleEvent(EventName="ServiceWarningCleared", CommunicationToken=ServiceWarning.CommunicationToken) within(420.0) {
+				
+				route SmartLinkOutputEvent(ServiceWarning,
+				                           ServiceWarning.DelayLevel1,
+				                           ServiceWarning.DelayLevel2,
+				                           false,
+				                           ServiceWarning.EventInfo7Minutes,
+				                           currentTime,
+				                           EventKey);
+				die;				
+			}
+			
+			on wait(420.0) and not SMARTLINKEvent(EventName="ServiceWarningCleared", CommunicationToken=ServiceWarning.CommunicationToken) {
+				route SmartLinkRepeatCheck(ServiceWarning); 
+			}
+	}
+}

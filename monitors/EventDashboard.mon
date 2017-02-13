@@ -1,0 +1,313 @@
+//*****************************************************************************
+//Title:         EventDashboard
+//Description:   EventDashboard description
+//Dependencies:  None
+//Author:        air15581
+
+//*****************************************************************************
+package com.atlascopco.ctsconnectivity;
+
+//MemoryStore
+using com.apama.memorystore.Storage;
+using com.apama.memorystore.Store;
+using com.apama.memorystore.Table;
+using com.apama.memorystore.Schema;
+using com.apama.memorystore.Iterator;
+using com.apama.memorystore.Finished;
+using com.apama.memorystore.Row;
+using com.apama.memorystore.RowChanged;
+
+monitor RTDashboard {
+	import "TimeFormatPlugin" as timeMgr;
+
+	sequence<string> MachineStatus;	
+	constant string STORE_NAME := "Store";
+	
+	Storage storage;
+	Table MachineStatusTable;
+	Table EventTable;
+	Store MainStore;
+	boolean DEBUG := false;
+	
+	dictionary<string, sequence<string> > RegisterConversion;
+	
+	//com.apama.database.DBUtil Eventdb;
+
+	action onload {		
+		
+		//Eventdb.setAdapterInstanceName("INSTANCE_1");
+		//Eventdb.openQuickODBC( "ApamaSQLWriteV2", "MicroStrategy_DEV_RW", "udEze6Re", handleError );
+		
+		prepareRegisterNameConvertor();		
+		prepareMachineStatus(); 
+		
+		listenTicketStatusUpdates();
+	}
+	
+	action listenTicketStatusUpdates() {
+		SmartLinkTicketStatusUpdate update;
+		
+		on all SmartLinkTicketStatusUpdate():update {
+			
+			Row r;
+			r:=EventTable.get(update.MachineEventHistoryId.toString());
+			r.setString("TicketStatus", update.TicketStatus.toString());
+			r.commit();	
+			
+		}
+	}
+	
+	
+	action prepareRegisterNameConvertor()
+	{
+		
+		SmartLinkRegisterConverter register;
+		
+		on all SmartLinkRegisterConverter():register {
+			
+			sequence<string> row := [];
+			row.append(register.RegisterName);
+			row.append(register.RegisterDescription);
+			row.append(register.QuantityId.toString());
+			row.append(register.QuantityName);
+			row.append(register.SISymbol);
+			row.append(register.MetricScale.toString());
+			row.append(register.MetricOffset.toString());
+			row.append(register.MetricSymbol);
+			row.append(register.ImperialScale.toString());
+			row.append(register.ImperialOffset.toString());
+			row.append(register.ImperialSymbol);
+			
+			// Lookup key
+			RegisterConversion.add(register.RegisterName, row );	
+			
+			if  DEBUG then {
+				print "Update/Insert Register : " + row.toString();
+			}
+			
+		}
+		
+	}
+	
+	action prepareMachineStatus() 
+	{
+		Finished f;
+		on Finished(id = storage.prepareOrCreate(STORE_NAME,"EventDashboard.store")):f 
+		{
+			if not f.success then {
+				log "Failed to prepare MemoryStore: "+f.status at ERROR;
+				die;
+			}
+			MainStore := storage.open(STORE_NAME);
+			prepareMachineStatusTable(MainStore);
+		}
+	}
+	
+	
+	/** Open the table. */
+	action prepareMachineStatusTable(Store store) 
+	{
+		
+		
+		Schema schema := new Schema;
+		schema.fields := ["MachineId", "CompressorState","WarningState","EmergencyStopState"];
+		schema.types := ["string", "string","string","string"];
+		schema.exposeMemoryView := false;
+		schema.memoryViewDisplayName := "MachineStatus";
+		
+		Finished f;
+		on Finished(id = store.prepare("MachineStatus", schema)):f 
+		{
+			if not f.success then {
+				log "Failed to prepare MemoryStore table: "+f.status at ERROR;
+				die;
+			}
+			MachineStatusTable := store.open("MachineStatus");
+			DataViewMachineStatus();
+			prepareEventsTable(MainStore);
+		}
+	}
+	
+	action DataViewMachineStatus() {
+
+		/** Check if MachineStatus DataViewItem already available */
+
+		SMARTLINKCompressorState DashboardMachineStatus;
+						
+			on all SMARTLINKCompressorState():DashboardMachineStatus {
+
+				Row r;
+				r:=MachineStatusTable.get(DashboardMachineStatus.CommunicationToken);
+				r.setString("MachineId", DashboardMachineStatus.CommunicationToken);
+				r.setString("CompressorState", DashboardMachineStatus.MachineState);
+				r.setString("WarningState", DashboardMachineStatus.GeneralWarningState.toString());
+				r.setString("EmergencyStopState",DashboardMachineStatus.EmergencyStopState.toString());
+				r.commit();	
+				integer int := MachineStatusTable.persist();
+			}
+		}
+	
+	
+	/** Open the table. */
+	action prepareEventsTable(Store store) 
+	{
+		Schema schema := new Schema;
+		schema.fields := ["MachineEventHistoryId","EventName","MachineId","RegisterName","SensorValue","UtcTime","UtcTimePres","UtcTimePresUS","LocalTime","LocalTimePres","LocalTimePresUS","Level1","Level2","EventInfo","Customer","Planner","SISymbol","MetricSymbol","ImperialSymbol","SensorValueMetric","SensorValueImperial","RegisterDescription","TicketStatus","EventKey","insertedon","URL"];
+		schema.types := ["string","string","string","string","float","float","string","string","float","string","string","string","string","string","string","string","string","string","string","float","float","string","string","string","float","string"];
+		schema.exposeMemoryView := true;
+		schema.memoryViewDisplayName := "Events";
+		
+		Finished f;
+		on Finished(id = store.prepare("Events", schema)):f 
+		{
+			if not f.success then {
+				log "Failed to prepare MemoryStore table: "+f.status at ERROR;
+				die;
+			}
+			EventTable := store.open("Events");
+			DataViewEvents();
+			cleanMemoryStoreEvents();
+		}
+	}
+	
+	action DataViewEvents() {
+		
+			SmartLinkDashboardEvent Event;
+
+			on all SmartLinkDashboardEvent():Event{
+					
+				// Lookup units + conversion
+				
+				string RegisterDescription := "";
+				string SISymbol := "";
+				string MetricSymbol := "";
+				string ImperialSymbol := "";
+				float MetricScale := 1.0;
+				float MetricOffset := 0.0;
+				float ImperialScale := 1.0;
+				float ImperialOffset := 0.0;
+				float SensorValueMetric := 0.0;
+				float SensorValueImperial := 0.0;
+						
+				if RegisterConversion.hasKey(Event.SmartLinkEvent.RegisterName) then
+				{
+
+					sequence<string> row := [];
+					
+					row := RegisterConversion.getOrDefault(Event.SmartLinkEvent.RegisterName);
+					
+					RegisterDescription := row[1];
+					SISymbol :=  row[4];
+					MetricSymbol := row[7];
+					ImperialSymbol := row[10];
+					MetricScale := row[5].toFloat();
+					MetricOffset := row[6].toFloat();
+					ImperialScale := row[8].toFloat();
+					ImperialOffset := row[9].toFloat();
+				}
+				
+				if Event.SmartLinkEvent.Sensorvalue.toFloat() != -9999.0 then {
+					SensorValueMetric := (Event.SmartLinkEvent.Sensorvalue.toFloat() * MetricScale) + MetricOffset;
+					SensorValueImperial := (Event.SmartLinkEvent.Sensorvalue.toFloat() * ImperialScale) + ImperialOffset;						
+				}
+				
+				string TheEventKey := Event.EventKey;
+				
+				Row r;
+				r:=EventTable.get(TheEventKey);
+				r.setString("MachineEventHistoryId", TheEventKey);
+				r.setString("EventName", Event.SmartLinkEvent.EventName.toString());
+				r.setString("MachineId", Event.SmartLinkEvent.CommunicationToken);
+				r.setString("RegisterName", Event.SmartLinkEvent.RegisterName.toString());
+				r.setFloat("Sensorvalue", Event.SmartLinkEvent.Sensorvalue.toFloat());
+				r.setFloat("UtcTime", Event.SmartLinkEvent.UtcTime.toFloat());
+				r.setString("UtcTimePres", 	timeMgr.formatUTC(Event.SmartLinkEvent.UtcTime.toFloat(), "dd-MM-yyyy HH:mm:ss"));
+				r.setString("UtcTimePresUS", 	timeMgr.formatUTC(Event.SmartLinkEvent.UtcTime.toFloat(), "MM-dd-yyyy hh:mm:ss a"));
+				r.setFloat("LocalTime", Event.SmartLinkEvent.LocalTime.toFloat());
+				r.setString("LocalTimePres", timeMgr.formatUTC(Event.SmartLinkEvent.LocalTime.toFloat(), "dd-MM-yyyy HH:mm:ss"));
+				r.setString("LocalTimePresUS", timeMgr.formatUTC(Event.SmartLinkEvent.LocalTime.toFloat(), "MM-dd-yyyy hh:mm:ss a"));
+				r.setString("Level1", Event.Level1);
+				r.setString("Level2", Event.Level2);
+				r.setString("EventInfo", Event.EventInfo);
+				r.setString("Customer", Event.Customer);
+				r.setString("Planner", Event.Planner);
+				r.setString("SISymbol",SISymbol);
+				r.setString("MetricSymbol",MetricSymbol);
+				r.setString("ImperialSymbol",ImperialSymbol);
+				r.setFloat("SensorValueMetric",SensorValueMetric);
+				r.setFloat("SensorValueImperial",SensorValueImperial);		
+				r.setString("RegisterDescription",RegisterDescription);
+				r.setString("TicketStatus",Event.TicketStatus);
+				r.setString("EventKey",Event.EventKey);
+				r.setFloat("insertedon",currentTime);
+				r.setString("URL","&Originator=" + RegisterDescription + "&EventName=" + Event.SmartLinkEvent.EventName.toString() + "&UtcTime=" + Event.SmartLinkEvent.UtcTime.toString() + "&Priority=" + Event.Level2 + "&Submitter=");
+				r.commit();	
+				integer int := EventTable.persist();
+		}
+	}	
+	
+	
+	action cleanMemoryStoreEvents() {
+
+		if DEBUG then {			
+			print "Auto-Close started";			
+		}
+
+		on all wait (60.0) {
+			//on all triggerCodeEvent(){ /*for debugging purposes*/
+
+			if DEBUG then {
+
+				print "MemstoreCleaning: event received";
+
+			}			
+			Iterator i :=  EventTable.begin();
+			while not i.done() {
+				Row r  := i.getRow();
+				boolean done := false;
+				while r.inTable() and not done {
+
+					if DEBUG then { print "intable";}
+
+					if ((currentTime - r.getFloat("insertedon"))> 86400.0 * 1.0) and (r.getString("TicketStatus") = "Open MR" or r.getString("TicketStatus") = "Closed")  then 
+					
+					{ /*One day - Open Auto-Close */
+
+						string EventKey := r.getString("EventKey");
+						
+
+						if DEBUG then { print "Do Auto-Close DB"; }
+
+						/*
+						string Update := 	"UPDATE dbo.CEP_FACT_Tickets SET TicketStatus = 'Auto-Close',
+											UpdatedTicketUtcTime = " + currentTime.toString() + ",
+											UpdatedBy = 'CEP Engine'
+											WHERE 
+											EventKey = '" + EventKey + "';";
+						
+						string Insert := 	"INSERT INTO dbo.CEP_FACT_TicketComments VALUES
+											('" + EventKey + currentTime.toString() +"','" + EventKey + "','Auto-Close','Auto-Closed by CEP'," + currentTime.toString() + ",'CEP Engine');";
+								
+						Eventdb.doSQLCmd(Update);
+						Eventdb.doSQLCmd(Insert);
+			*/
+						//Eventdb.close(false);
+						
+						r.remove();						
+						done := r.tryCommitOrUpdate();				   
+						if DEBUG then { print "Tickets auto-closed";}					
+
+					}
+					else { done := true;				   
+					if DEBUG then { print "false";}
+					}
+				}
+				i.step();
+			}		
+		}	
+	}	
+	
+	action handleError( string reason ) {
+		log "DB Error: " + reason at ERROR;
+	}
+}

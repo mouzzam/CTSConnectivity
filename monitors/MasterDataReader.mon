@@ -1,0 +1,236 @@
+//*****************************************************************************
+// Title:         MasterDataReader
+// Description:   MasterDataReader description
+// Dependencies:  None
+// Author:        air15396
+//
+//*****************************************************************************
+package com.atlascopco.ctsconnectivity;
+
+monitor MasterDataReader {
+	
+	com.apama.database.DBUtil dbMasterData;
+	com.apama.database.DBUtil dbConverterMasterData;
+	com.apama.database.DBUtil dbConverterFaultCodes;
+	com.apama.database.DBUtil dbRegisters;
+	
+	constant boolean DEBUG := false;
+	
+	action onload {
+
+		on wait(10.0) {
+			
+			if DEBUG then {print "First Run Register";}
+			
+			LoadRegisters();
+		}
+
+		on wait(20.0) {
+			if DEBUG then {print "First Run MasterData & ConverterMasterData";}
+			LoadMasterData();
+			LoadConverterMasterData();
+			LoadConverterFaultCodes();
+		}	
+		
+		on all wait(9600.0) {
+			LoadRegisters();			
+			LoadConverterMasterData();
+			LoadConverterFaultCodes();
+		}
+		
+		on all wait(9600.0) {
+			LoadMasterData();
+		}
+	}
+		
+	/**  Load Registers */
+	action LoadRegisters{
+		
+		
+		string adapterInstanceName := "INSTANCE_1";
+		dbRegisters.setAdapterInstanceName(adapterInstanceName);
+		
+		if DEBUG then {	
+			print "TryConnectingToDatabase";
+			 }
+		log "Loading Aggregates Data";
+		
+		dbRegisters.openQuickODBC( "ApamaSQLWriteV2", "MicroStrategy_DEV_RW", "udEze6Re", handleError );
+		if DEBUG then { print "TryReadingQuery"; }
+		dbRegisters.doSQLQuery( "select t1.RegisterName, t1.RegisterDescription, t1.QuantityId, t2.QuantityName, Isnull(t2.Symbol,' ') SISymbol, 
+		               Isnull(t3.Scale,1) MetricScale, Isnull(t3.Offset,0) MetricOffset, Isnull(t3.Symbol,' ') MetricSymbol,
+		               Isnull(t4.Scale,1) ImperialScale, Isnull(t4.Offset,0) ImperialOffset, isnull(t4.Symbol,' ') ImperialSymbol
+		                from 
+		               dbo.dim_registerRepository t1 with (nolock) inner join 
+		               dbo.DIM_RegisterQuantity t2 with (nolock) on (t1.QuantityId = t2.QuantityId and t2.MeasurementSystemTypeId = 0)
+		               inner join 
+		               dbo.DIM_RegisterQuantity t3 with (nolock) on (t1.QuantityId = t3.QuantityId and t3.MeasurementSystemTypeId = 1)
+		               inner join
+		               dbo.DIM_RegisterQuantity t4 with (nolock) on (t1.QuantityId = t4.QuantityId and t4.MeasurementSystemTypeId = 2)
+		               order by 1", HandleRegisters );	
+		dbRegisters.close( false);
+	}
+
+	action HandleRegisters( dictionary< string, string > data ) {
+
+		if DEBUG then { print data.toString(); }
+
+		route SmartLinkRegisterConverter(
+		data["registername"],
+		data["registerdescription"],
+		data["quantityid"].toInteger(),
+		data["quantityname"],
+		data["sisymbol"],
+		data["metricscale"].toFloat(),
+		data["metricoffset"].toFloat(),
+		data["metricsymbol"],
+		data["imperialscale"].toFloat(),
+		data["imperialoffset"].toFloat(),
+		data["imperialsymbol"]);
+
+		if DEBUG then {
+			print "Register Data" + data.toString();
+		}
+		
+	}
+	
+	
+	/**  Load ConverterMasterData */
+	action LoadConverterMasterData(){
+		
+		
+		string adapterInstanceName := "INSTANCE_1";
+		dbConverterMasterData.setAdapterInstanceName(adapterInstanceName);
+		
+		if DEBUG then {	
+			print "TryConnectingToDatabase";
+			 }
+		log "Loading ConverterMasterData";
+		
+		dbConverterMasterData.openQuickODBC( "ApamaSQLWriteV2", "MicroStrategy_DEV_RW", "udEze6Re", handleError );
+		if DEBUG then { print "TryReadingQuery"; }
+		dbConverterMasterData.doSQLQuery( "SELECT Isnull([CategoryId],-1) as [CategoryId]
+		                         ,Isnull([ConverterType],'N/A') as [ConverterType]
+		                         ,Isnull([ConverterId],-1) as [ConverterId]
+		                         FROM [dbo].[CEP_DIM_Converter] with (nolock)", HandleConverterMasterData );	
+		dbConverterMasterData.close( false);
+	}
+	
+	
+	
+	/**  Load ConverterFaultCodes */
+	action LoadConverterFaultCodes(){
+		
+		
+		string adapterInstanceName := "INSTANCE_1";
+		dbConverterFaultCodes.setAdapterInstanceName(adapterInstanceName);
+		
+		if DEBUG then {	
+			print "TryConnectingToDatabase";
+			 }
+		log "Loading ConverterFaultCodes";
+		
+		dbConverterFaultCodes.openQuickODBC( "ApamaSQLWriteV2", "MicroStrategy_DEV_RW", "udEze6Re", handleError);
+		if DEBUG then { print "TryReadingQuery"; }
+		dbConverterFaultCodes.doSQLQuery( "SELECT Isnull([ConverterId],-1) as [ConverterId]
+		                                  ,Isnull([VSDFaultCode],-1) as [VSDFaultCode]
+		                                  ,Isnull([ACFaultCode],-1) as [ACFaultCode]
+		                                  ,Isnull([ArticleId],-1) as [ArticleId]
+		                              FROM [dbo].[CEP_DIM_VSD_ErrorCodes] with (nolock)", HandleConverterFaultCodes );	
+		dbConverterFaultCodes.close( false);
+	}
+	
+	
+	action HandleConverterMasterData( dictionary< string, string > data ) {
+
+		if DEBUG then { print "HandleConverterMasterData: " + data.toString(); }
+
+		route SmartLinkConverterMasterData(
+		data["categoryid"].toInteger(),
+		data["convertertype"],
+		data["converterid"].toInteger());
+
+		if DEBUG then {
+			print "MasterData" + data.toString();
+		}		
+	}
+	
+	
+	
+	action HandleConverterFaultCodes( dictionary< string, string > data ) {
+
+		if DEBUG then {print "HandleConverterFaultCodes: " +  data.toString(); }
+
+		route SmartLinkConverterFaultCode(
+		data["converterid"].toInteger(),
+		data["vsdfaultcode"].toInteger(),
+		data["acfaultcode"].toInteger(),
+		data["articleid"].toInteger());
+		if DEBUG then {
+		print "VSDFaultCodes" + data.toString();
+		}		
+	}
+	
+	
+	
+	/**  Load MasterData  */
+	action LoadMasterData{
+		
+		
+		string adapterInstanceName := "INSTANCE_1";
+		dbMasterData.setAdapterInstanceName(adapterInstanceName);
+		
+		if DEBUG then {	
+			print "TryConnectingToDatabase";
+			 }
+		log "Loading Aggregates Data";
+		//
+		dbMasterData.openQuickODBC( "ApamaSQLWriteV2", "MicroStrategy_DEV_RW", "udEze6Re", handleError );
+		if DEBUG then { print "TryReadingQuery"; }
+		dbMasterData.doSQLQuery( "select 
+		                         t1.CommunicationToken,
+		                         Isnull(t1.Model,'N/A') Model,
+		                         t1.MachineTypeId,
+		                         Case when t1.SuperVisionFlag = 'True' then 'Y' else 'N' End SuperVisionFlag,
+		                         Isnull(t1.Timezone,'W. Europe Standard Time') Timezone,
+		                         Isnull(t2.Difference,0) LocalTimeDifference,
+		                         Isnull(t1.M2MStableMode,'N/A') M2MStableMode,
+		                         Isnull(t1.SmartBoxFlag,'N') SmartBoxFlag,
+		                         Isnull(t1.UploadType,'N/A') UploadType,
+		                         Isnull(t3.modelPrefix,'N/A') ModelPrefix
+		                         from 
+		                         dbo.DIM_MasterData  t1 with (nolock)
+		                         left join 
+		                         stg.TimeZoneConversion t2 with (nolock)
+		                         on (t1.Timezone = t2.TimeZoneID)
+		                         left join [dbo].[DIM_MasterData_Tech]  t3 with(nolock) on (t1.machineid = t3.machineid)		                                          
+		                         where Isnull(t1.CommunicationTimeout,-9999999) <> -9999999 and t1.visible <> 0 and t1.machinetypeid not in (1,2)", HandleMasterData);	
+		dbMasterData.close( false);
+	}
+	
+	action HandleMasterData( dictionary< string, string > data ){
+
+		if DEBUG then { print data.toString(); }
+
+		send SmartLinkMachineMasterData(
+		data["communicationtoken"],
+		data["model"],
+		data["machinetypeid"].toInteger(),
+		data["supervisionflag"],
+		data["timezone"],
+		data["localtimedifference"].toInteger(),
+		data["m2mstablemode"],
+		data["smartboxflag"],
+		data["uploadtype"], 
+		data["modelprefix"]) to "MasterDataChannel";
+
+		if DEBUG then {
+			print "MasterData" + data.toString();
+		}		
+	}
+	
+	action handleError( string reason ) {
+		log "DB Error: " + reason at ERROR;
+	}
+
+}

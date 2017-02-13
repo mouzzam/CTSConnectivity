@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+	$Copyright (c) 2009 Progress Software Corporation. All rights reserved. $
+	$Copyright (c) 2013 Software AG, Darmstadt, Germany and/or Software AG USA Inc., Reston, VA, USA, and/or its Subsidiaries and or/its Affiliates and/or their licensors.$
+	Use, reproduction, transfer, publication or disclosure is prohibited except as specifically provided for in your License Agreement with Software AG
+-->
+
+<namedQuery xmlns:xi="http://www.w3.org/2001/XInclude">
+
+	<query
+		name="findEarliest"
+		description="Get the row with the earliest time." 
+		implementationFunction="substitution" 
+		inputString="select * from ${TABLE_NAME} order by ${TIME_COLUMN_NAME} asc limit 1">
+			<parameter
+				description="Name of a table to query"
+				name="TABLE_NAME" 
+				type="String" 
+				default=""/>
+			<parameter
+				description="Name of the time column"
+				name="TIME_COLUMN_NAME" 
+				type="String" 
+				default="time"/>
+	</query>
+	<query
+		name="findLatest"
+		description="Get the row with the latest time." 
+		implementationFunction="substitution" 
+		inputString="select * from ${TABLE_NAME} order by ${TIME_COLUMN_NAME} desc limit 1">
+			<parameter
+				description="Name of a table to query"
+				name="TABLE_NAME" 
+				type="String" 
+				default=""/>
+			<parameter
+				description="Name of the time column"
+				name="TIME_COLUMN_NAME" 
+				type="String" 
+				default="timeField"/>
+	</query>
+	<query
+		name="getCount"
+		description="Get the number of rows in a table" 
+		implementationFunction="substitution" 
+		inputString="select count(*) as count from ${TABLE_NAME}">
+			<parameter
+				description="Name of a table to query"
+				name="TABLE_NAME" 
+				type="String" 
+				default=""/>
+	</query>
+	<query
+		name="findAll"
+		description="Get All rows from a table" 
+		implementationFunction="substitution" 
+		inputString="select * from ${TABLE_NAME}">
+			<parameter
+				description="Name of a table to query"
+				name="TABLE_NAME" 
+				type="String" 
+				default=""/>
+	</query>
+	<query
+		name="findAllSorted"
+		description="Get all rows from a table ordered by a column" 
+		implementationFunction="substitution" 
+		inputString="select * from ${TABLE_NAME} order by ${SORT_COLUMN_NAME} ${SORT_ORDER}">
+			<parameter
+				description="Name of a table to query"
+				name="TABLE_NAME" 
+				type="String" 
+				default=""/>
+			<parameter
+				description="Name of a column to use for sorting"
+				name="SORT_COLUMN_NAME" 
+				type="String" 
+				default="time"/>
+			<parameter
+				description="Sort order (asc or desc)"
+				name="SORT_ORDER" 
+				type="String" 
+				default="asc"/>
+	</query>
+
+</namedQuery>

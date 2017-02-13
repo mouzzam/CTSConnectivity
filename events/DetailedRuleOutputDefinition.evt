@@ -1,0 +1,182 @@
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("GeneralRules","DefaultNoRegisterNameCheck","Match","DigitalContact2","N","NoRegisterName","","X","5","AirContact - no supervision","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("GeneralRules","DefaultNoRegisterNameCheck","Match","DigitalContact3","N","NoRegisterName","","X","5","AirContact - no supervision","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("GeneralRules","DefaultNoRegisterNameCheck","Match","DigitalContact4","N","NoRegisterName","","X","5","AirContact - no supervision","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("GeneralRules","DefaultNoRegisterNameCheck","Match","PowerSupplyFailure","N","NoRegisterName","","C","3","AirContact - no supervision","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("GeneralRules","DefaultNoRegisterNameCheck","Match","LicenseExpired","N","NoRegisterName","","NA","4","License process","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("GeneralRules","DefaultNoRegisterNameCheck","Match","EmergencyStop","N","NoRegisterName","","M","4","Stopped by Emergency stop","Default conclusion","V0.5")
+
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("StartFailureRules","DefaultNoRegisterNameCheck","Match","GeneralStartFailure","N","NoRegisterName","","M","1","StartFailure - Check with customer","Default conclusion","V0.5")
+
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("GeneralShutdownRules","DefaultMissingOriginator","Match","GeneralShutdown","Y","NoRegisterName","","M","1","Shutdown - Check with customer","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("GeneralShutdownRules","Default","Match","GeneralShutdown","Y","1003","Element 1 outlet temp","M","1","Shutdown - Element 1 temp related -  Check with customer","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("GeneralShutdownRules","Default","Match","GeneralShutdown","Y","1004","Element 2 inlet temp","M","1","Shutdown - Element 2 temp related -  Check with customer","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("GeneralShutdownRules","Default","Match","GeneralShutdown","Y","1008","Element Outlet","M","1","Check filters / oil level with customer","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("GeneralShutdownRules","Default","Match","GeneralShutdown","Y","1005","Element 2 outlet temp","M","1","Shutdown - Element 2 temp related -  Check with customer","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("GeneralShutdownRules","Default","Match","GeneralShutdown","Y","509","Compressor Outlet","M","1","Shutdown - Outlet Pressure related -  Check with customer","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("GeneralShutdownRules","Default","Match","GeneralShutdown","Y","501","Dp air filter","M","1","Shutdown - Replace air filter -  Check with customer","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("GeneralShutdownRules","Default","Match","GeneralShutdown","Y","602","Dp oil separator","M","1","Shutdown - Replace oil sparator -  Check with customer","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("GeneralShutdownRules","Default","Match","GeneralShutdown","Y","511","Intercooler","M","1","Shutdown - Replace/check Intercooler -  Check with customer","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("GeneralShutdownRules","Default","Match","GeneralShutdown","Y","1102","Oil Temperature","M","1","Shutdown - Check oil -  Check with customer","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("GeneralShutdownRules","Default","Match","GeneralShutdown","Y","2107","Starter Feedback contact","M","1","Shutdown - Check power supply with customer","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("GeneralShutdownRules","Default","Match","GeneralShutdown","Y","2126","Condensate Drain Dryer","M","1","Shutdown - Check drains with customer","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("GeneralShutdownRules","Default","Match","GeneralShutdown","Y","605","Oil pressure","M","1","Shutdown - Check oil pressure with customer","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("GeneralShutdownRules","Default","Match","GeneralShutdown","Y","2105","Overload Fan Motor","M","1","Shutdown - Check fan motor with customer","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("GeneralShutdownRules","Default","Match","GeneralShutdown","Y","2178","Fault Converters","M","1","Shutdown - Check convertors motor with customer","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("GeneralShutdownRules","Default","Match","GeneralShutdown","N","2918","Dryer Rotation Error","M","1","Shutdown - Check dryer rotation","Default conclusion","V0.5")
+
+
+
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("BatteryFailureRules","DefaultNoRegisterNameCheck","Match","BatteryFailureWarning","N","NoRegisterName","","C","3","BatteryFailure Warning - check with customer","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("CommunicationErrorRules","DefaultNoRegisterNameCheck","Match","CommunicationError","N","NoRegisterName","","C","3","CommunicationError - check with customer","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("CommunicationErrorRules","DefaultNoRegisterNameCheck","Match","UploadFailed","N","NoRegisterName","","C","1","Check network/connection with customer","Default conclusion","V0.5")
+
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("GeneralShutdownWarningRules","Default","Match","GeneralShutdownWarning","Y","1008","Element Outlet","M","1","Check filters / oil level with customer","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("GeneralShutdownWarningRules","Default","Match","GeneralShutdownWarning","Y","1003","Element 1 outlet temp","M","1","Check ventilation/filters with customer / possible coating wear","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("GeneralShutdownWarningRules","DefaultMissingOriginator","Match","GeneralShutdownWarning","Y","NoRegisterName","","M","3","GeneralShutdownWarning - Check with customer ","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("GeneralShutdownWarningRules","Default","Match","GeneralShutdownWarning","Y","1400","Delta T element","M","1","Element 2 temp related -  Check with customer","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("GeneralShutdownWarningRules","Default","Match","GeneralShutdownWarning","Y","1102","Oil Temperature","M","1","Oil Temperature -  Check with customer","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("GeneralShutdownWarningRules","Default","Match","GeneralShutdownWarning","Y","1005","Element 2 outlet temp","M","1","Check ventilation/filters with customer / possible coating wear","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("GeneralShutdownWarningRules","Default","Match","GeneralShutdownWarning","N","1210","Energy Recovery Water In","P","6","Ignore","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("GeneralShutdownWarningRules","Default","Match","GeneralShutdownWarning","N","1211","Energy Recovery Water Out","P","6","Ignore","Default conclusion","V0.5")
+
+
+
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("GeneralWarningRules","Default","Match","GeneralWarning","Y","1010","Dryer LAT","P","1","Dryer needs repair, find root cause.","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("GeneralWarningRules","Default","Match","GeneralWarning","Y","1017","Regeneration air outlet","M","3","Check Dryer with customer","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("GeneralWarningRules","Default","Match","GeneralWarning","Y","1400","Delta T element","M","1","Warning/Delta T element ","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("GeneralWarningRules","Default","Match","GeneralWarning","Y","2110","Electr. condensate drain","M","1","Check drain/startup condition with customer","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("GeneralWarningRules","Default","Match","GeneralWarning","Y","2917","Dryer Load Too Low","M","3","Low load, check with customer","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("GeneralWarningRules","Default","Match","GeneralWarning","Y","1409","Dryer regen.IN-inlet DT","M","3","Dryer problem, check with customer","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("GeneralWarningRules","Default","Match","GeneralWarning","Y","1019","Regeneration air inlet","M","3","Dryer problem, check with customer","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("GeneralWarningRules","Default","Match","GeneralWarning","Y","2911","High dewpoint","P","1","Dryer needs repair, find root cause with customer","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("GeneralWarningRules","Default","Match","GeneralWarning","Y","2939","Condensate Drain AC","P","3","Check drain with customer","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("GeneralWarningRules","Default","Match","GeneralWarning","Y","2916","Dryer Regeneration In-Out DT Too High","P","3","Check dryer with customer","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("GeneralWarningRules","Default","Match","GeneralWarning","N","2945","Dryer Energy Saving Freeze Protection","P","6","Check dryer with customer","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("GeneralWarningRules","DefaultMissingOriginator","Match","GeneralWarning","Y","NoRegisterName","","M","3","Warning - Check with customer ","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("GeneralWarningRules","Default","Match","GeneralWarning","N","2918","Dryer Rotation Error","M","1","Check dryer rotation","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("GeneralWarningRules","Default","Match","GeneralWarning","N","1210","Energy Recovery Water In","P","6","Ignore","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("GeneralWarningRules","Default","Match","GeneralWarning","N","1211","Energy Recovery Water Out","P","6","Ignore","Default conclusion","V0.5")
+
+
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("ServiceRules","DefaultNoRegisterNameCheck","Match","AirConnectPreServiceWarningHigh","N","NoRegisterName","","X","5","Local SMARTLINK Admin rule triggered ","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("ServiceRules","DefaultNoRegisterNameCheck","Match","AirConnectPreServiceWarningLow","N","NoRegisterName","","X","5","Local SMARTLINK Admin rule triggered ","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("ServiceRules","DefaultNoRegisterNameCheck","Match","PreServiceWarning","N","NoRegisterName","","NA","4","Preservice Warning - plan/sell service","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("ServiceRules","Default","Match","GeneralServiceWarning","Y","2520","Service Level RH","NA","4","Operations/Marketing - plan/sell service","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("ServiceRules","Default","Match","GeneralServiceWarning","Y","2521","Service Level RTH","NA","4","Operations/Marketing - plan/sell service","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("ServiceRules","Default","Match","GeneralServiceWarning","Y","501","Dp air filter","M","3","Replace/check air filter","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("ServiceRules","Default","Match","GeneralServiceWarning","Y","602","Dp oil separator","M","3","Replace/check oil seperator","Default conclusion","V0.5")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("ServiceRules","DefaultMissingOriginator","Match","GeneralServiceWarning","Y","NoRegisterName","Default Rule","M","3","Service Warning - check with customer","Default conclusion","V0.5")
+
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("NoChecksRules","NoSpecificChecksDefinedYet","NoMatch","EventNameIndependent","","NoRegisterName","","U","5","No specific checks defined yet.","","")
+
+/*AmbientAirCheck*/
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("AmbientAirCheck","AMB_1_1_1","Match","","","","","M","1","AmbientTemperatureTooHigh","Ambient temperature too high. ","")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("AmbientAirCheck","AMB_1_1_2","NoMatch","","","","","M","4","AmbientTemperatureOk","Ambient temperature within limits.","")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("AmbientAirCheck","AMB_1_1_3","Match","","","","","M","3","AmbientTemperatureLow","Ambient air temperature low, watch out for freeze damage. ","")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("AmbientAirCheck","AMB_1_1_4","InSufficientData","","","","","M","4","InSufficientData","No Sufficient data.","")
+
+/*ColdStartupCheck*/
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("OilPressureLogic","SF_1_1_1","Match","","","","","M","4","StartupPhaseActive","Startup phase active, oil temp too low. Check cooling medium.","")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("OilPressureLogic","SF_1_1_2","NoMatch","","","","","M","5","StartupPhaseInActive","Startup phase inactive, check for other issues.","")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("OilPressureLogic","SF_1_1_3","InSufficientData","","","","","M","4","InSufficientData","Insufficient Data","")
+
+/*CondensateDrainCheck*/
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("CondensateDrainChecks","CDR_1_1_1","Match","","","","","M","3","AfterCoolerCondensateDrainProblem","Problem with aftercooler condensate drain. ","")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("CondensateDrainChecks","CDR_1_1_2","Match","","","","","M","1","InterCoolerCondensateDrainProblem","Problem with intercooler condensate drain, repair to avoid water leaking into the element.  ","")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("CondensateDrainChecks","CDR_1_1_3","Match","","","","","M","3","CondensateDrainProblem","Problem with condensate drain. ","")
+
+/*CombinedChecks*/
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("CombinedChecks","COMB_0001","Match","","","","","M","3","PossibleHpElementProblem","Intercooler pressure too high and LP element temperature too high. Possible issue with HP element.","")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("CombinedChecks","COMB_0002","Match","","","","","M","3","PossibleLpElementProblem","Intercooler pressure too low and HP element temperature too high. Possible issue with LP element.","")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("CombinedChecks","COMB_0003","Match","","","","","M","3","ICCircuitLeak","Intercooler pressure too low and LP element temperature too high. Check for a leak in the IC circuit.","")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("CombinedChecks","COMB_0004","Match","","","","","M","3","OilCoolerProblem","Low oil injection pressure & high injection temp. Might indicate clogged cooler. ","")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("CombinedChecks","COMB_0005","Match","","","","","M","3","CoolingProblem","Machine is not sufficiently cooled. ","")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("CombinedChecks","COMB_0006","Match","","","","","M","3","DryerLatProblem","Dryer functionality not garanteed: dryer lat issue.","")
+
+/*ConverterFaults*/
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("ConverterFaultCheck","CVTR_1_1_1","Match","","","","","M","1","ConverterProblem. ","Converter error. ","1.0")
+
+/*CoolingWaterInCheck*/
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("CoolingWaterInCheck","CWI_1_1_1","Match","","","","","M","1","CoolingWaterInTooHigh","Cooling water in temperature too high. ","")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("CoolingWaterInCheck","CWI_1_1_2","NoMatch","","","","","M","4","CoolingWaterInTempOk","Cooling water in temperature within limits.","")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("CoolingWaterInCheck","CWI_1_1_3","Match","","","","","M","3","CoolingWaterInTempLow","Cooling water in temperature low, watch out for freeze damage. ","")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("CoolingWaterInCheck","CWI_1_1_4","InSufficientData","","","","","M","4","InSufficientData","No Sufficient data.","")
+
+/*CoolingMediumCheck*/
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("CoolingMediumCheck","CLM_1_1_1","Match","","","","","M","1","CoolingMediumTemperatureTooHigh","Cooling medium temperature too high. ","")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("CoolingMediumCheck","CLM_1_1_2","NoMatch","","","","","M","4","CoolingMediumTemperatureOk","Cooling medium temperature within limits.","")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("CoolingMediumCheck","CLM_1_1_4","InSufficientData","","","","","M","4","InSufficientData","No Sufficient data.","")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("CoolingMediumCheck","CLM_1_1_3","","","","","","M","1","","Cooling medium low, watch out for freeze damage. ","")
+
+
+/*CoolingSystemFlowCheck*/
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("CoolingSystemFlowCheck","CSF_2_1_1","Match","","","","","M","1","CoolingSystemClogged","Avg Flow last week: check for sufficient flow in the cooling system. System might be clogged. ","")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("CoolingSystemFlowCheck","CSF_2_1_2","NoMatch","","","","","M","4","SufficientFlow","Cooling flow last week ok.","")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("CoolingSystemFlowCheck","CSF_2_1_3","InSufficientData","","","","","M","4","InSufficientData","No Sufficient data.","")
+
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("CoolingSystemFlowCheck","CSF_1_1_1","NoMatch","","","","","M","4","SufficientFlow","Cooling flow on event ok.","")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("CoolingSystemFlowCheck","CSF_1_1_2","Match","","","","","M","1","CoolingSystemClogged","Flow on event: check for sufficient flow in the cooling system. Cooling system might be clogged. ","")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("CoolingSystemFlowCheck","CSF_1_1_3","InSufficientData","","","","","M","4","InSufficientData","No Sufficient data.","")
+
+/*DpOilFilterCheck*/
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("DpOilFilter","DPOF_1_1_1","NoMatch","","","","","M","4","DpOilFilterOk","Dp oil cooler ok. ","")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("DpOilFilter","DPOF_1_1_2","Match","","","","","M","3","DpOilFilterTooHigh","Dp oil cooler too High. Check for clogged oil cooler. ","")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("DpOilFilter","DPOF_1_1_3","InSufficientData","","","","","M","4","InSufficientData","Insufficient Data","")
+
+/*DpOilSeparatorCheck*/
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("DpOilSeparator","DPOS_1_1_1","NoMatch","","","","","M","4","DpOilSeparatorOK","Dp oil separator within limits. ","")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("DpOilSeparator","DPOS_1_1_2","Match","","","","","M","3","DpOilSeparatorTooHigh","Dp oil separator too high : check condition oil separator.","")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("DpOilSeparator","DPOS_1_1_3","InSufficientData","","","","","M","4","InSufficientData","Insufficient Data","")
+
+/*InterCoolerPressure*/
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("InterCoolerPressure","ICP_1_1_1","NoMatch","","","","","M","4","InterCoolerPressureOK","Intercooler pressure on event ok. ","")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("InterCoolerPressure","ICP_1_1_2","Match","","","","","M","3","InterCoolerPressureTooLow","Intercooler pressure on event too low. ","")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("InterCoolerPressure","ICP_1_1_3","Match","","","","","M","3","InterCoolerPressureTooHigh","Intercooler pressure on event too high. ","")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("InterCoolerPressure","ICP_1_1_4","InSufficientData","","","","","M","4","InSufficientData","InSufficientData","")
+
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("InterCoolerPressure","ICP_2_1_1","NoMatch","","","","","M","4","InterCoolerPressureOK","Average intercoolerpressure last week ok. ","")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("InterCoolerPressure","ICP_2_1_2","Match","","","","","M","3","InterCoolerPressureTooLow","Average intercoolerpressure last week too low.","")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("InterCoolerPressure","ICP_2_1_3","Match","","","","","M","3","InterCoolerPressureTooHigh","Intercooler pressure last week too high. ","")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("InterCoolerPressure","ICP_2_1_4","InSufficientData","","","","","M","4","InSufficientData","InSufficientData","")
+
+/*LowLoadCheck*/
+
+/*OilPressure*/
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("OilPressureLogic","OP_2_1_1","Match","","","","","M","1","OilPressureDropping","Oil Pressure too low, check oil level, oil filters & oil coolers , check for water leakage.","")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("OilPressureLogic","OP_2_1_2","NoMatch","","","","","M","4","OilPressureOk","Oil Pressure ok.","")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("OilPressureLogic","OP_2_1_3","InSufficientData","","","","","M","4","InSufficientData","Insufficient Data","")
+
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("OilPressureLogic","OP_1_2_1","Match","","","","","M","1","OilPressureTooHigh","Oil Pressure too high, check oil level, oil filters & oil coolers, check for water leakage .","")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("OilPressureLogic","OP_1_2_2","Match","","","","","M","1","OilPressureTooLow","Oil Pressure too low, check oil level, oil filters & oil coolers , check for water leakage .","")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("OilPressureLogic","OP_1_2_3","NoMatch","","","","","M","4","OilPressureOk","Oil Pressure ok.","")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("OilPressureLogic","OP_1_2_4","InSufficientData","","","","","M","4","InSufficientData","Insufficient Data","")
+
+/*OilInjectionPressure*/
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("OilInjectionPressure","OIP_1_1_1","NoMatch","","","","","M","4","OilInjectionPressureOK","Oil Injection pressure ok. ","")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("OilInjectionPressure","OIP_1_1_2","Match","","","","","M","3","OilInjectionPressureTooLow","Oil Injection pressure too low. Machine running at high risk for element bearing damage. ","")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("OilInjectionPressure","OIP_1_1_3","NoMatch","","","","","M","4","InSufficientData","Insufficient Data","")
+
+/*OilInjectionTemperature*/
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("OilInjectionTemperature","OIT_1_1_1","NoMatch","","","","","M","4","OilInjectionTempOK","Oil Injection temp ok. ","")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("OilInjectionTemperature","OIT_1_1_2","Match","","","","","M","3","OilInjectionTempTooHigh","Oil Injection temp too high: check oil cooling.","")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("OilInjectionTemperature","OIT_1_1_3","NoMatch","","","","","M","4","InSufficientData","Insufficient Data","")
+
+/*SensorErrorCheck*/
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("SensorCheckLogic","SC_1_1_1","Match","","","","","M","3","PressureSensorError:Id= ","Pressure sensor issue. Check sensor with sensorId: ","")
+
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("SensorCheckLogic","SC_1_2_1","Match","","","","","M","3","TemparatureSensorError:Id=","Temperature sensor issue. Check sensor with sensorId: ","")
+
+/*RegAirTempCheck*/
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("RegAirTemp","RAT_1_1_1","NoMatch","","","","","M","4","RegenerationAirTempOK","Regeneration air temp: OK","")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("RegAirTemp","RAT_1_1_2","Match","","","","","M","3","RegenerationAirTempTooLow","Regeneration air temps too low: watch out for dryer hardware failure after a few months.  Loss of dryer functionality. ","")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("RegAirTemp","RAT_1_1_3","InSufficientData","","","","","M","4","InSufficientData","Insufficient Data","")
+
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("RegAirTemp","RAT_1_2_2","Match","","","","","M","3","RegenerationAirTempTooHigh","Regeneration air temps too high: watch out for loss of dryer functionality. Possible issues: cooling temp too high, cooling medium / cooling water too hot. Coolant flow is blocked in the dryer.","")
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("RegAirTemp","RAT_1_1_3","InSufficientData","","","","","M","4","InSufficientData","Insufficient Data","")
+
+/*BlockAIr*/
+
+com.atlascopco.ctsconnectivity.SmartLinkOutputDefinition("BlockAirCheck","BLKA_1_1_1","Match","","","","","M","1","BlockAirDetected","Expected problem with air regulator: should replace regulator at next visit ECB API0631","")
+
+
+

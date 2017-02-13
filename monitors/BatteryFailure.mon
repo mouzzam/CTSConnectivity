@@ -1,0 +1,26 @@
+//*****************************************************************************
+// Title:         BatteryFailure
+// Description:   BatteryFailure description
+// Dependencies:  None
+// Author:        AIR15581
+/** BatteryFailure logic
+* Show first event battry failure event
+* Suppress following battery failure events for one week except if a GeneralShutdown on the same machine occurs
+*/
+//
+//*****************************************************************************
+
+package com.atlascopco.ctsconnectivity;
+
+monitor BatteryFailure {
+	
+	action onload() {		
+		
+		SmartLinkRuleEvent BatteryFailureWarning;
+
+		on all SmartLinkRuleEvent(EventName="BatteryFailureWarning"//,Repeated="Y"
+		                          ):BatteryFailureWarning {
+				route SmartLinkRepeatCheck(BatteryFailureWarning);
+		}			
+	}	
+}

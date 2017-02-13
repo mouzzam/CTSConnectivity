@@ -1,0 +1,25 @@
+//*****************************************************************************
+// Title:         EmailTest
+// Description:   EmailTest description
+// Dependencies:  None
+// Author:        air15581
+//
+//*****************************************************************************
+
+package com.atlascopco.ctsconnectivity;
+using com.apamax.email.SendMail;
+
+// TODO: Monitors and event definitions here
+
+
+persistent monitor EmailTest {
+	
+	action onload() {			
+		
+	sequence <string> w := [];
+			
+	 send SendMail("koen.verschaeren@be.atlascopco.com","koen.verschaeren@be.atlascopco.com","Test Mail", "Test Body Mail", w) to "SEND_MAIL";
+	 	 
+	}
+		
+}

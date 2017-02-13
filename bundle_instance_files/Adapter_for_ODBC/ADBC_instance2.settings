@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	$Copyright (c) 2011 Progress Software Corporation. All rights reserved. $
+	$Copyright (c) 2013 Software AG, Darmstadt, Germany and/or Software AG USA Inc., Reston, VA, USA, and/or its Subsidiaries and or/its Affiliates and/or their licensors.$
+	Use, reproduction, transfer, publication or disclosure is prohibited except as specifically provided for in your License Agreement with Software AG
+-->
+<mappingInfo xmlns="urn:mappinginfo" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <generateServiceMon>true</generateServiceMon>
+  <parameters>
+    <parameterMap type="evt-options">
+      <param name="autoStartEvents" value="true"/>
+    </parameterMap>
+  </parameters>
+  <events>
+    <event name="SmartLinkOutputEvent" package="com.atlascopco.ctsconnectivity" type="EVENT">
+      <table name="P_CEP_TestDBWrite" url="Apama"/>
+      <properties>
+        <property name="time" type="float" value="time"/>
+        <property name="USER_NAME" type="HIDDEN" value="BI_DEV_RW"/>
+        <property name="PASSWORD" type="HIDDEN" value="dA8EPu8A"/>
+      </properties>
+    </event>
+  </events>
+  <dbs>
+    <db url="Apama">
+      <tabledescriptions>
+        <tabledescription name="P_CEP_TestDBWrite">
+          <fields>
+            <field name="machineeventhistoryid" type="bigint"/>
+            <field name="level1" type="varchar"/>
+            <field name="level2" type="varchar"/>
+            <field name="eventinfo" type="varchar"/>
+            <field name="time" type="float"/>
+          </fields>
+        </tabledescription>
+      </tabledescriptions>
+    </db>
+  </dbs>
+</mappingInfo>
